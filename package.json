@@ -2,6 +2,11 @@
   "name": "flowit",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "Edwin Bonifacio",
+    "email": "edwinjbc87@gmail.com"
+  },
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
