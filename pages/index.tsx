@@ -3,8 +3,11 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import { FormattedMessage, useIntl } from "react-intl"
 
 const Home: NextPage = () => {
+  const intl = useIntl();
+
   return (
     <PublicLayout>
     <div className={styles.container}>
@@ -14,9 +17,17 @@ const Home: NextPage = () => {
           <a href="https://nextjs.org">Flow:t!</a>
         </h1>
 
+        <div className={'canvas'}>
+          <section className='col-span-4'>
+
+          </section>
+          <section className='col-auto'>
+
+          </section>
+        </div>
+
         <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.tsx</code>
+          {intl.formatMessage({id: 'pages.index.subtitle'})}
         </p>
       </main>
 
