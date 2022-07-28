@@ -17,7 +17,7 @@ export default function PublicNavbar(props:any) {
                 <Link
                   href="/" passHref
                 >
-                  Flow:it!
+                  Flow:t!
                 </Link>
             </div>
             <button className="cursor-pointer text-xl leading-none px-3 py-1 border border-solid border-transparent rounded bg-transparent block lg:hidden outline-none focus:outline-none"

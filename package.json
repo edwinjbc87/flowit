@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.2",
-    "@types/jsonwebtoken": "^8.5.8",
     "bcrypt": "^5.0.1",
     "cookie-session": "^2.0.0",
     "cookies-next": "^2.0.4",
@@ -41,6 +40,7 @@
     "@types/passport-google-oauth20": "^2.0.11",
     "@types/react": "18.0.15",
     "@types/react-dom": "18.0.6",
+    "@types/jsonwebtoken": "^8.5.8",
     "autoprefixer": "^10.4.7",
     "eslint": "8.20.0",
     "eslint-config-next": "12.2.3",
