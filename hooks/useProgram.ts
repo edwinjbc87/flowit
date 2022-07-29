@@ -14,10 +14,12 @@ export default function useProgram() {
             nodes: [{
                 id: 0,
                 name: "op0",
+                text: "Inicio",
                 type: NodeType.Start
             },{
                 id: 1,
                 name: "op1",
+                text: "Fin",
                 type: NodeType.End
             }],
             connections: [{

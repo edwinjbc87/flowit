@@ -11,4 +11,5 @@ export interface Node {
     id: number;
     type: NodeType;
     name: string;
+    text: string;
 }
