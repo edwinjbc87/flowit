@@ -2,10 +2,10 @@ import { createRef, useEffect, useRef } from "react";
 import FlowChart from "flowchart.js";
 
 export default function DiagramWrapper({content}){
-    const dgCont = useRef(null);
+    const dgCont = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (typeof window !== "undefined" && dgCont != null && !!content) {
+        if (typeof window !== "undefined" && dgCont.current != null && !!content) {
             console.log("Content", content)
             dgCont.current.innerHTML = "";
             const dgr = FlowChart.parse(content)
