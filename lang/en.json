@@ -1,3 +1,9 @@
 {
-    "pages.index.subtitle": "A tool for helping students learn programming"
+    "pages.index.subtitle": "A tool for helping students learn programming",
+    "actions.start": "Start",
+    "actions.end": "End",
+    "actions.operation": "Operation",
+    "actions.condition": "Condition",
+    "actions.loop": "Loop",
+    "actions.subroutine": "Subroutine"
 }
