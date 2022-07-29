@@ -22,7 +22,10 @@
       "@/models/*": ["models/*"],
       "@/entities/*": ["entities/*"],
       "@/public/*": ["public/*"],
-      "@/hooks/*": ["hooks/*"]
+      "@/hooks/*": ["hooks/*"],
+      "@/styles/*": ["styles/*"],
+      "@/pages/*": ["pages/*"],
+      "@/store/*": ["store/*"]
     },
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

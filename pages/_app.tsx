@@ -4,6 +4,9 @@ import { useRouter } from "next/router";
 import { IntlProvider } from "react-intl"
 import en from "../lang/en.json";
 import es from "../lang/es.json";
+import { Provider } from 'react-redux';
+import {wrapper} from '@/store/index';
+import withRedux from 'next-redux-wrapper'
 
 const messages = {
   es,
@@ -17,9 +20,9 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
   <IntlProvider locale={String(locale)} messages={messages[String(locale)]}>
-    <Component {...pageProps} />
+      <Component {...pageProps} />
   </IntlProvider>)
     
 }
 
-export default MyApp
+export default wrapper.withRedux(MyApp) 

@@ -2,48 +2,29 @@ import PublicLayout from '@/components/layouts/public-layout';
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
+import Link from 'next/link'
 import styles from '../styles/Home.module.css'
 import { FormattedMessage, useIntl } from "react-intl"
+import ActionsList from '@/components/flowit/actions-list';
+import ProgramDiagram from '@/components/flowit/program-diagram';
+
 
 const Home: NextPage = () => {
   const intl = useIntl();
 
   return (
     <PublicLayout>
-    <div className={styles.container}>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          <a href="https://nextjs.org">Flow:t!</a>
-        </h1>
-
-        <div className={'canvas'}>
-          <section className='col-span-4'>
-
-          </section>
-          <section className='col-auto'>
-
-          </section>
-        </div>
-
-        <p className={styles.description}>
-          {intl.formatMessage({id: 'pages.index.subtitle'})}
-        </p>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
-    </div>
+      <div className={'canvas flex w-full divide divide-x'}>
+        <section className='w-64 p-1'>
+          <ActionsList />
+        </section>
+        <section className='flex-auto p-1'>
+          <ProgramDiagram />
+        </section>
+      </div>
+      <div className={styles.container}>
+        
+      </div>
     </PublicLayout>
   );
 }
