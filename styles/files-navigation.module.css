@@ -1,0 +1,4 @@
+.files-navigation :global(.nav-tabs .nav-link.active) {
+    color: #2563eb;
+    border-color: #2563eb;
+}

@@ -1,0 +1,62 @@
+{
+    "main": "Program.flw",
+    "modules": [
+        {
+            "name": "Program.flw",
+            "type": "program",
+            "operations": [
+                {
+                    "id": 0,
+                    "order": 0,
+                    "name": "Inicio",
+                    "type": "start"
+                },
+                {
+                    "id": 1,
+                    "order": 4,
+                    "name": "Fin",
+                    "type": "end"
+                },
+                {
+                    "id": 2,
+                    "order": 1,
+                    "name": "Declarar a",
+                    "type": "declaration",
+                    "variable": {
+                        "type": "integer",
+                        "name": "a",
+                        "value": "1"
+                    }
+                },
+                {
+                    "id": 3,
+                    "order": 2,
+                    "name": "Declarar b",
+                    "type": "declaration",
+                    "variable": {
+                        "type": "integer",
+                        "name": "b",
+                        "value": "5"
+                    }
+                },
+                {
+                    "id": 4,
+                    "order": 3,
+                    "name": "Imprimir result",
+                    "type": "output",
+                    "expression": {
+                        "operator": "sum",
+                        "left": {
+                            "type": "variable",
+                            "name": "a"
+                        },
+                        "right": {
+                            "type": "variable",
+                            "name": "b"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

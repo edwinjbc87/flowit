@@ -9,6 +9,8 @@ import { NodeConnectionType } from "@/entities/NodeConnection"
 import ActionIcon from "./action-icon"
 import { NodeType } from "@/entities/Node"
 import ActionNode from "./action-node"
+import ActionSelector from "./action-selector"
+import FilesNavigation from "./files-navigation"
 
 export interface IProgram{
     diagram: Diagram;
@@ -23,6 +25,7 @@ export default function ProgramDiagram() {
     const intl = useIntl();
 
     const {diagram, handler} = useProgram();
+    const [dlgSelAction, setDlgSelAction] = useState(false);
 
     useEffect(() => {
         handler.initDiagram().catch(er => console.error(er));
@@ -34,7 +37,7 @@ export default function ProgramDiagram() {
 
     return (
         <div>
-            <h2>{intl.formatMessage({id: "playground.program"})}</h2>
+            <FilesNavigation></FilesNavigation>
             <section className={styles.diagram}>
                 {diagram.nodes.length > 0 && <ReactFlow defaultNodes={diagram.nodes.map(n=>({
                     id: String(n.id),
@@ -47,11 +50,12 @@ export default function ProgramDiagram() {
                     type: 'straight',
                     markerEnd: {type: MarkerType.Arrow},
                     data: {label: c.type != NodeConnectionType.Default ? c.type : ""}
-                }))} nodesDraggable={true} onEdgeClick={()=>alert("Edge Clicked")} onNodeDoubleClick={(ev, n)=>editNode(n.id)}>
+                }))} nodesDraggable={true} onEdgeClick={()=>setDlgSelAction(true)} onNodeDoubleClick={(ev, n)=>editNode(n.id)}>
                     <Background />
                     <Controls />
                 </ReactFlow>}
             </section>
+            <ActionSelector show={dlgSelAction} onDismiss={()=>{setDlgSelAction(false)}}></ActionSelector>
         </div>
     );
 }

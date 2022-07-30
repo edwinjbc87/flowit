@@ -15,9 +15,6 @@ const Home: NextPage = () => {
   return (
     <PublicLayout>
       <div className={'canvas flex w-full divide divide-x'}>
-        <section className='w-64 p-1'>
-          <ActionsList />
-        </section>
         <section className='flex-auto p-1'>
           <ProgramDiagram />
         </section>
