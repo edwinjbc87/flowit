@@ -27,13 +27,13 @@ export default function PublicNavbar(props:any) {
               <i className="fas fa-bars"></i>
             </button>
           </div>
-          <PublicUserBox className={`hidden`} user={props.user}></PublicUserBox>
+          {false && <PublicUserBox className={`hidden`} user={props.user}></PublicUserBox>}
           <div
             className={`${(navbarOpen?"block":"hidden")} lg:flex flex-grow items-center bg-white lg:bg-opacity-0 lg:shadow-none`}
             id="example-navbar-warning"
           >
             <ul className="flex flex-col lg:flex-row list-none mr-auto">
-              <li><PublicUserBox user={props.user}></PublicUserBox></li>
+              {false && <li><PublicUserBox user={props.user}></PublicUserBox></li>}
               <li className="flex items-center">
                 <a
                   className="hover:text-blueGray-500 text-blueGray-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"

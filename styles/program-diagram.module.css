@@ -1,0 +1,11 @@
+.diagram {
+    border: solid 1px #ccc;
+    height: calc(100vh - 200px);
+}
+.diagram :global(.react-flow){
+    background: #eee;
+}
+
+.diagram :global(.react-flow .react-flow__edge-path:hover) {
+    stroke-width: 4 !important;
+}

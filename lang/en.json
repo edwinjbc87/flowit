@@ -6,7 +6,8 @@
     "playground.end": "End",
     "actions.start": "Start",
     "actions.end": "End",
-    "actions.operation": "Operation",
+    "actions.input": "Input",
+    "actions.output": "Output",
     "actions.condition": "Condition",
     "actions.loop": "Loop",
     "actions.asignment": "Asignment"

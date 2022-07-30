@@ -22,9 +22,6 @@ const Home: NextPage = () => {
           <ProgramDiagram />
         </section>
       </div>
-      <div className={styles.container}>
-        
-      </div>
     </PublicLayout>
   );
 }

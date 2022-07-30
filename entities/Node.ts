@@ -1,10 +1,11 @@
 export enum NodeType {
     Start = 'start',
     End = 'end',
-    Operation = 'operation',
     Condition = 'condition',
     Asignment = 'asignment',
     Loop = 'loop',
+    Input = 'input',
+    Output = 'output',
 }
 
 export interface Node {
