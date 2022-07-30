@@ -3,7 +3,7 @@ export enum NodeType {
     End = 'end',
     Operation = 'operation',
     Condition = 'condition',
-    Subroutine = 'subroutine',
+    Asignment = 'asignment',
     Loop = 'loop',
 }
 

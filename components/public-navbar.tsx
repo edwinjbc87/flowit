@@ -27,7 +27,7 @@ export default function PublicNavbar(props:any) {
               <i className="fas fa-bars"></i>
             </button>
           </div>
-          <PublicUserBox className={`hidden lg:flex`} user={props.user}></PublicUserBox>
+          <PublicUserBox className={`hidden`} user={props.user}></PublicUserBox>
           <div
             className={`${(navbarOpen?"block":"hidden")} lg:flex flex-grow items-center bg-white lg:bg-opacity-0 lg:shadow-none`}
             id="example-navbar-warning"

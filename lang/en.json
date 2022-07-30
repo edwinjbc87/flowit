@@ -1,9 +1,13 @@
 {
     "pages.index.subtitle": "A tool for helping students learn programming",
+    "playground.actions": "Actions",
+    "playground.program": "Program",
+    "playground.start": "Start",
+    "playground.end": "End",
     "actions.start": "Start",
     "actions.end": "End",
     "actions.operation": "Operation",
     "actions.condition": "Condition",
     "actions.loop": "Loop",
-    "actions.subroutine": "Subroutine"
+    "actions.asignment": "Asignment"
 }
