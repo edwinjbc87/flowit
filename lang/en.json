@@ -10,5 +10,6 @@
     "actions.output": "Output",
     "actions.condition": "Condition",
     "actions.loop": "Loop",
-    "actions.asignment": "Asignment"
+    "actions.asignment": "Asignment",
+    "actions.declaration": "Declaration"
 }

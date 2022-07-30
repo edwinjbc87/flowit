@@ -3,6 +3,7 @@ import { NodeType } from "@/entities/Node";
 import {BsCircle, BsCircleFill, BsQuestionCircleFill, BsQuestionDiamond, BsBoxArrowInRight, BsBoxArrowRight} from "react-icons/bs"
 import {FiArrowLeft} from "react-icons/fi"
 import {TiArrowLoop} from "react-icons/ti"
+import {HiVariable} from "react-icons/hi"
 
 export interface IActionIconProps{
     type: NodeType;
@@ -39,6 +40,10 @@ export default function ActionIcon(props:IActionIconProps&React.HTMLAttributes<H
             }
             case NodeType.Asignment: {
                 setIcon(<FiArrowLeft size={24} className={props.className} />);
+                break;
+            }
+            case NodeType.Declaration: {
+                setIcon(<HiVariable size={24} className={props.className} />);
                 break;
             }
         }
