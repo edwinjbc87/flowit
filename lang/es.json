@@ -1,9 +1,13 @@
 {
     "pages.index.subtitle": "Una herramienta para ayudar a los estudiantes a aprender a programar",
+    "playground.actions": "Acciones",
+    "playground.program": "Programa",
+    "playground.start": "Inicio",
+    "playground.end": "Fin",
     "actions.start": "Inicio",
     "actions.end": "Fin",
     "actions.operation": "Operación",
     "actions.condition": "Condición",
     "actions.loop": "Bucle",
-    "actions.subroutine": "Subrutina"
+    "actions.asignment": "Asignación"
 }

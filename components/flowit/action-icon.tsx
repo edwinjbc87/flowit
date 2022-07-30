@@ -1,7 +1,8 @@
 import { Component, useEffect, useState } from "react";
 import { NodeType } from "@/entities/Node";
 import {BsCircle, BsCircleFill, BsQuestionCircleFill, BsQuestionDiamond} from "react-icons/bs"
-import {BiRectangle, BiCodeBlock} from "react-icons/bi"
+import {BiRectangle} from "react-icons/bi"
+import {FiArrowLeft} from "react-icons/fi"
 import {TiArrowLoop} from "react-icons/ti"
 
 export interface IActionIconProps{
@@ -33,8 +34,8 @@ export default function ActionIcon(props:IActionIconProps&React.HTMLAttributes<H
                 setIcon(<TiArrowLoop size={24} className={props.className} />);
                 break;
             }
-            case NodeType.Subroutine: {
-                setIcon(<BiCodeBlock size={24} className={props.className} />);
+            case NodeType.Asignment: {
+                setIcon(<FiArrowLeft size={24} className={props.className} />);
                 break;
             }
         }
