@@ -44,7 +44,7 @@ export default function ProgramDiagram() {
             <section style={{height: "calc(100vh - 200px)"}}>
                 {diagram.nodes.length > 0 && <ReactFlow nodes={diagram.nodes.map(n=>({
                     id: String(n.id),
-                    data: {label: <ActionNode {...{id: n.id, type: n.type, text: n.text, onClick: ()=>editNode(n.id)}}></ActionNode>},
+                    data: {label: <ActionNode {...{id: String(n.id), type: n.type, text: n.text, onClick: ()=>editNode(String(n.id))}}></ActionNode>},
                     position: {x: 300, y: n.id * 100}
                 }))} edges={diagram.connections.map(c => ({
                     id: String(c.id),
