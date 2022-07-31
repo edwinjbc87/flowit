@@ -6,8 +6,10 @@
     "playground.end": "Fin",
     "actions.start": "Inicio",
     "actions.end": "Fin",
-    "actions.operation": "Operación",
+    "actions.input": "Entrada",
+    "actions.output": "Salida",
     "actions.condition": "Condición",
     "actions.loop": "Bucle",
-    "actions.asignment": "Asignación"
+    "actions.asignment": "Asignación",
+    "actions.declaration": "Declaración"
 }

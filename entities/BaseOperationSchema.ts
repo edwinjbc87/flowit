@@ -1,4 +1,4 @@
-export enum NodeType {
+export enum OperationType {
     Start = 'start',
     End = 'end',
     Declaration = 'declaration',
@@ -9,11 +9,10 @@ export enum NodeType {
     Loop = 'loop',
 }
 
-export interface Node {
+export interface BaseOperationSchema {
     id: number;
-    type: NodeType;
     name: string;
-    text: string;
-    x?: number;
-    y?: number;
+    type: OperationType;
+    order: number;
+    level: number;
 }

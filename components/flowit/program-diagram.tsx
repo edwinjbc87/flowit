@@ -1,63 +1,65 @@
 import { Diagram } from "@/entities/Diagram"
-import { parseDiagram } from "@/libs/flowit/operations-parser"
+import styles from '@/styles/program-diagram.module.css'
 import { useEffect, useState } from "react"
-import flowchart from 'flowchart.js'
 import useProgram from "@/hooks/useProgram"
 import dynamic from 'next/dynamic'
 import { FormattedMessage, useIntl } from "react-intl"
-import ReactFlow, { MiniMap, Controls } from 'react-flow-renderer'
+import ReactFlow, { MiniMap, Controls, Background, MarkerType } from 'react-flow-renderer'
 import { NodeConnectionType } from "@/entities/NodeConnection"
 import ActionIcon from "./action-icon"
 import { NodeType } from "@/entities/Node"
 import ActionNode from "./action-node"
+import ActionSelector from "./action-selector"
+import FilesNavigation from "./files-navigation"
+import { parseSchema } from "@/libs/flowit/operations-parser"
+import { ProgramSchema } from "@/entities/ProgramSchema"
+const program = require("@/data/program") as ProgramSchema;
 
 export interface IProgram{
     diagram: Diagram;
 }
 
-const DynamicDiagramWrapperWithNoSSR = dynamic(
-    () => import('./diagram-wrapper'),
-    { ssr: false }
-)
-
 export default function ProgramDiagram() {
     const intl = useIntl();
 
-    const {diagram, handler} = useProgram();
-    const [diagramContent, setDiagramContent] = useState<string>("");
+    const {project, diagram, handler} = useProgram();
+    const [dlgSelAction, setDlgSelAction] = useState(false);
+    
+    const loadProgram = async () => {
+        const progContent = program as ProgramSchema;
+        const project = parseSchema(progContent);
+        await handler.setProject(project);
+    }
 
     useEffect(() => {
-        handler.initDiagram().catch(er => console.error(er));
+        loadProgram().catch(er => console.error(er));
     }, [])
 
-    useEffect(() => {
-        setDiagramContent(parseDiagram(diagram));
-    }, [diagram])
-
     const editNode = (id: string) => {
-        alert(id + " " + diagram.nodes.find(n=>String(n.id) == id)?.text);
+        alert(id + " " + diagram?.nodes.find(n=>String(n.id) == id)?.text)
     }
 
     return (
         <div>
-            <h2>{intl.formatMessage({id: "playground.program"})}</h2>
-            <section style={{height: "calc(100vh - 200px)"}}>
-                {diagram.nodes.length > 0 && <ReactFlow nodes={diagram.nodes.map(n=>({
+            <FilesNavigation></FilesNavigation>
+            <section className={styles.diagram}>
+                {diagram && diagram.nodes.length > 0 && <ReactFlow defaultNodes={diagram.nodes.map(n=>({
                     id: String(n.id),
-                    data: {label: <ActionNode {...{id: String(n.id), type: n.type, text: n.text, onClick: ()=>editNode(String(n.id))}}></ActionNode>},
-                    position: {x: 300, y: n.id * 100}
+                    data: {label: <ActionNode {...{id: String(n.id), type: n.type, text: n.text}}></ActionNode>},
+                    position: {x: Number(String(n.x)), y: Number(String(n.y))},
                 }))} edges={diagram.connections.map(c => ({
                     id: String(c.id),
                     source: String(c.from),
                     target: String(c.to),
                     type: 'straight',
-                    markerEnd: 'arrow',
+                    markerEnd: {type: MarkerType.Arrow},
                     data: {label: c.type != NodeConnectionType.Default ? c.type : ""}
-                }))}>
-                    <MiniMap />
+                }))} nodesDraggable={true} onEdgeClick={()=>setDlgSelAction(true)} onNodeDoubleClick={(ev, n)=>editNode(n.id)}>
+                    <Background />
                     <Controls />
                 </ReactFlow>}
             </section>
+            <ActionSelector show={dlgSelAction} onDismiss={()=>{setDlgSelAction(false)}}></ActionSelector>
         </div>
     );
 }
