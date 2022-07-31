@@ -7,6 +7,7 @@ import styles from '../styles/Home.module.css'
 import { FormattedMessage, useIntl } from "react-intl"
 import ActionsList from '@/components/flowit/actions-list';
 import ProgramDiagram from '@/components/flowit/program-diagram';
+import ProgramExecution from '@/components/flowit/program-execution';
 
 
 const Home: NextPage = () => {
@@ -14,9 +15,12 @@ const Home: NextPage = () => {
 
   return (
     <PublicLayout>
-      <div className={'canvas flex w-full divide divide-x'}>
-        <section className='flex-auto p-1'>
+      <div className={'canvas grid grid-cols-4 w-full divide divide-x'}>
+        <section className='col-span-3 p-1'>
           <ProgramDiagram />
+        </section>
+        <section className='p-1'>
+          <ProgramExecution />
         </section>
       </div>
     </PublicLayout>
