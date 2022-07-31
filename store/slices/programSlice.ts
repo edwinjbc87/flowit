@@ -1,5 +1,6 @@
 import { Diagram } from '@/entities/Diagram';
 import { NodeConnectionType } from '@/entities/NodeConnection';
+import { ProgramExecution } from '@/entities/ProgramExecution';
 import { Project } from '@/entities/Project';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
@@ -7,6 +8,7 @@ export interface ProgramState {
     diagram: Diagram;
     project: Project;
     currentModuleIndex: number;
+    execution: ProgramExecution;
 }
 
 const initialState: ProgramState = {
@@ -19,6 +21,12 @@ const initialState: ProgramState = {
         modules: [],
     },
     currentModuleIndex: 0,
+    execution: {
+        isRunning: false,
+        currentNode: 0,
+        variables: new Map(),
+        output: [],
+    }
 }
 
 export const programSlice = createSlice({
@@ -64,11 +72,20 @@ export const programSlice = createSlice({
             state.currentModuleIndex = state.project.modules.findIndex(module => module.name == action.payload)
             state.diagram = state.project.modules[state.currentModuleIndex].diagram
         },
+        setExecution: (state, action) => {
+            state.execution = { ...state.execution, ...action.payload }
+        },
+        setExecutionVariable: (state, action) => {
+            state.execution.variables.set(action.payload.key, action.payload.value)
+        },
+        addExecutionOutput: (state, action) => {
+            state.execution.output.push(action.payload)
+        }
     },
     extraReducers: (builder)=>{
       //builder.addCase(refreshDiagram.fulfilled, (state, action) => { state.comentarios = [...action.payload]; });
     }
 })
 
-export const { setDiagram, setProject, setCurrentModule } = programSlice.actions
+export const { setDiagram, setProject, setCurrentModule, setExecution, setExecutionVariable, addExecutionOutput } = programSlice.actions
 export default programSlice.reducer

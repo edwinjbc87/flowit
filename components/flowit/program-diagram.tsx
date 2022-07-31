@@ -22,7 +22,7 @@ export interface IProgram{
 export default function ProgramDiagram() {
     const intl = useIntl();
 
-    const {project, diagram, handler} = useProgram();
+    const {diagram, handler} = useProgram();
     const [dlgSelAction, setDlgSelAction] = useState(false);
     
     const loadProgram = async () => {

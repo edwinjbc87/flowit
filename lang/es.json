@@ -3,6 +3,7 @@
     "playground.actions": "Acciones",
     "playground.program": "Programa",
     "playground.run": "Ejecutar",    
+    "playground.running": "Ejecutando...",    
     "playground.start": "Inicio",
     "playground.end": "Fin",
     "actions.start": "Inicio",
