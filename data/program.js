@@ -46,7 +46,7 @@ module.exports = {
                 {
                     "id": 4,
                     "order": 3,
-                    "name": "Imprimir result",
+                    "name": "Imprimir resultado",
                     "type": "output",
                     "expression": {
                         "operator": "sum",

@@ -3,7 +3,9 @@ import { NodeType } from "@/entities/Node";
 import {BsCircle, BsCircleFill, BsQuestionCircleFill, BsQuestionDiamond, BsBoxArrowInRight, BsBoxArrowRight} from "react-icons/bs"
 import {FiArrowLeft} from "react-icons/fi"
 import {TiArrowLoop} from "react-icons/ti"
-import {HiVariable} from "react-icons/hi"
+import {TbVariable} from "react-icons/tb"
+import {AiOutlineExport} from "react-icons/ai"
+import {MdInput} from "react-icons/md"
 
 export interface IActionIconProps{
     type: NodeType;
@@ -27,11 +29,11 @@ export default function ActionIcon(props:IActionIconProps&React.HTMLAttributes<H
                 break;
             }
             case NodeType.Input: {
-                setIcon(<BsBoxArrowInRight size={24} className={props.className} />);
+                setIcon(<MdInput size={24} className={props.className} />);
                 break;
             }
             case NodeType.Output: {
-                setIcon(<BsBoxArrowRight size={24} className={props.className} />);
+                setIcon(<AiOutlineExport size={24} className={props.className} />);
                 break;
             }
             case NodeType.Loop: {
@@ -43,7 +45,7 @@ export default function ActionIcon(props:IActionIconProps&React.HTMLAttributes<H
                 break;
             }
             case NodeType.Declaration: {
-                setIcon(<HiVariable size={24} className={props.className} />);
+                setIcon(<TbVariable size={24} className={props.className} />);
                 break;
             }
         }
