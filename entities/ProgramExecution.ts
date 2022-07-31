@@ -1,6 +1,6 @@
 export interface ProgramExecution {
     isRunning: boolean;
     currentNode: number;
-    variables: Map<string, any>;
+    variables: Object;
     output: string[]
 }

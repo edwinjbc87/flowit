@@ -10,20 +10,12 @@ import styles from "@/styles/program-execution.module.css";
 
 export default function ProgramExecution(){
     const intl = useIntl();
-    const {project, execution, handler} = useProgram();
-    const [program, setProgram] = useState<ProgramSchema>();
+    const {project, program, execution, handler} = useProgram();
 
-    const loadProgram = async () => {
-        setProgram(programSchema as ProgramSchema);
-    }
 
     const runProgram = async () => {
         await handler.runProgram();
     }
-
-    useEffect(() => {
-        loadProgram().catch(er => console.error(er));
-    }, [])
 
     return (
         <aside className="divide-y h-full">
@@ -40,14 +32,18 @@ export default function ProgramExecution(){
                             </tr>
                         </thead>
                         <tbody className="overflow-y-scroll">
-                            <tr>
-
-                            </tr>
+                            {Object.keys(execution.variables).map(key => (
+                                <tr key={key} className="border-b">
+                                    <td className="px-3 py-4 text-sm font-medium text-gray-900 text-left">{key}</td>
+                                    <td className="px-3 py-4 text-sm font-medium text-gray-900 text-left">{execution.variables[key]}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </section>
                 <section className={`overflow-y-scroll bg-black dark:text-white p-2 ${styles.console}`}>
-                    <pre>Prueba</pre>
+                    {execution.output.map((line, index) => (<pre key={`o-${index}`}>{line}</pre>))}
+                    <pre></pre>
                 </section>
             </section>
         </aside>

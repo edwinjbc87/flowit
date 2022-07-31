@@ -1,14 +1,17 @@
 import { Diagram } from '@/entities/Diagram';
 import { NodeConnectionType } from '@/entities/NodeConnection';
 import { ProgramExecution } from '@/entities/ProgramExecution';
+import { ProgramSchema } from '@/entities/ProgramSchema';
 import { Project } from '@/entities/Project';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { parseSchema } from "@/libs/flowit/operations-parser"
 
 export interface ProgramState {
     diagram: Diagram;
     project: Project;
     currentModuleIndex: number;
     execution: ProgramExecution;
+    program: ProgramSchema;
 }
 
 const initialState: ProgramState = {
@@ -24,8 +27,12 @@ const initialState: ProgramState = {
     execution: {
         isRunning: false,
         currentNode: 0,
-        variables: new Map(),
+        variables: {},
         output: [],
+    },
+    program: {
+        main: '',
+        modules: [],
     }
 }
 
@@ -76,10 +83,16 @@ export const programSlice = createSlice({
             state.execution = { ...state.execution, ...action.payload }
         },
         setExecutionVariable: (state, action) => {
-            state.execution.variables.set(action.payload.key, action.payload.value)
+            state.execution.variables[action.payload.key] = action.payload.value
         },
         addExecutionOutput: (state, action) => {
             state.execution.output.push(action.payload)
+        },
+        setProgram: (state, action) => {
+            state.program = action.payload
+            state.project = parseSchema(state.program)
+            state.currentModuleIndex = state.project.modules.findIndex(module => module.name == state.project.main)
+            state.diagram = state.project.modules[state.currentModuleIndex].diagram
         }
     },
     extraReducers: (builder)=>{
@@ -87,5 +100,5 @@ export const programSlice = createSlice({
     }
 })
 
-export const { setDiagram, setProject, setCurrentModule, setExecution, setExecutionVariable, addExecutionOutput } = programSlice.actions
+export const { setProgram, setDiagram, setProject, setCurrentModule, setExecution, setExecutionVariable, addExecutionOutput } = programSlice.actions
 export default programSlice.reducer

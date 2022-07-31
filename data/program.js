@@ -49,14 +49,14 @@ module.exports = {
                     "name": "Imprimir resultado",
                     "type": "output",
                     "expression": {
-                        "operator": "sum",
+                        "operation": "sum",
                         "left": {
-                            "type": "variable",
-                            "name": "a"
+                            "operator": "variable",
+                            "left": "a"
                         },
                         "right": {
-                            "type": "variable",
-                            "name": "b"
+                            "operator": "variable",
+                            "left": "b"
                         }
                     },
                     "level": 0
