@@ -67,6 +67,16 @@ export function parseModule(moduleSchema:ModuleSchema): Diagram {
                 } as Node;
                 diagram.nodes.push(node);
             }
+            if(operation.type === OperationType.Input) {
+                let node = {
+                    text: operation.name, 
+                    type: String(operation.type) as NodeType,
+                    id: operation.id,
+                    x: window.innerWidth / 2 - 200,
+                    y: operation.order * 100 + initOffset,
+                } as Node;
+                diagram.nodes.push(node);
+            }
             //#endregion
 
             //#region Create connection

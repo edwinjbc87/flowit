@@ -14,7 +14,7 @@ module.exports = {
                 },
                 {
                     "id": 1,
-                    "order": 4,
+                    "order": 6,
                     "name": "Fin",
                     "type": "end",
                     "level": 0
@@ -25,9 +25,9 @@ module.exports = {
                     "name": "Declarar a",
                     "type": "declaration",
                     "variable": {
-                        "type": "integer",
+                        "type": "number",
                         "name": "a",
-                        "value": "1"
+                        "value": "0"
                     },
                     "level": 0
                 },
@@ -37,26 +37,44 @@ module.exports = {
                     "name": "Declarar b",
                     "type": "declaration",
                     "variable": {
-                        "type": "integer",
+                        "type": "number",
                         "name": "b",
-                        "value": "5"
+                        "value": "0"
                     },
                     "level": 0
                 },
                 {
                     "id": 4,
                     "order": 3,
-                    "name": "Imprimir resultado",
+                    "name": "Leer a",
+                    "type": "input",
+                    "message": "Ingrese el valor de a",
+                    "variable": "a",
+                    "level": 0
+                },
+                {
+                    "id": 5,
+                    "order": 4,
+                    "name": "Leer b",
+                    "type": "input",
+                    "message": "Ingrese el valor de b",
+                    "variable": "b",
+                    "level": 0
+                },
+                {
+                    "id": 6,
+                    "order": 5,
+                    "name": "Imprimir suma",
                     "type": "output",
                     "expression": {
-                        "operator": "sum",
+                        "operation": "sum",
                         "left": {
-                            "type": "variable",
-                            "name": "a"
+                            "operation": "variable",
+                            "left": "a"
                         },
                         "right": {
-                            "type": "variable",
-                            "name": "b"
+                            "operation": "variable",
+                            "left": "b"
                         }
                     },
                     "level": 0

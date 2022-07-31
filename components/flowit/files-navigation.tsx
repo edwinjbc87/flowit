@@ -4,8 +4,7 @@ import styles from '@/styles/files-navigation.module.css';
 export default function FilesNavigation() {
     const {project, handler} = useProgram();
 
-
-   return (
+    return (
     <section className={styles['files-navigation']}>
         <ul className="nav nav-tabs flex flex-col md:flex-row flex-wrap list-none border-b-0 pl-0 mb-0" id="tabs-tab" role="tablist">
             {project.modules.map(m => (

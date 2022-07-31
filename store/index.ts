@@ -2,6 +2,9 @@ import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
 import programReducer from './slices/programSlice';
 import { createWrapper, HYDRATE } from 'next-redux-wrapper';
+import { enableMapSet } from 'immer';
+
+enableMapSet();
 
 export const makeStore = () => configureStore({
   reducer: {

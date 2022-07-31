@@ -1,7 +1,12 @@
-.console{
-    font-family: monospace;
+.execution-panel__main {
+    height: calc(100% - 41px);
 }
 
-.console p::before{
+.console{
+    font-family: monospace;
+    font-size: 0.7em;
+}
+
+.console pre::before{
     content: "> ";
 }

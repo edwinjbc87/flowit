@@ -11,7 +11,6 @@ import { NodeType } from "@/entities/Node"
 import ActionNode from "./action-node"
 import ActionSelector from "./action-selector"
 import FilesNavigation from "./files-navigation"
-import { parseSchema } from "@/libs/flowit/operations-parser"
 import { ProgramSchema } from "@/entities/ProgramSchema"
 const program = require("@/data/program") as ProgramSchema;
 
@@ -22,18 +21,9 @@ export interface IProgram{
 export default function ProgramDiagram() {
     const intl = useIntl();
 
-    const {project, diagram, handler} = useProgram();
+    const {diagram} = useProgram();
     const [dlgSelAction, setDlgSelAction] = useState(false);
     
-    const loadProgram = async () => {
-        const progContent = program as ProgramSchema;
-        const project = parseSchema(progContent);
-        await handler.setProject(project);
-    }
-
-    useEffect(() => {
-        loadProgram().catch(er => console.error(er));
-    }, [])
 
     const editNode = (id: string) => {
         alert(id + " " + diagram?.nodes.find(n=>String(n.id) == id)?.text)

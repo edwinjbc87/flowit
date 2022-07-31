@@ -32,6 +32,6 @@ export interface LiteralOperandSchema extends OperandSchema {
 
 export interface ExpressionSchema {
     operation: string;
-    left: OperandSchema;
-    right: OperandSchema;
+    left: ExpressionSchema | any;
+    right?: ExpressionSchema | any;
 }

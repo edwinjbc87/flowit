@@ -8,10 +8,23 @@ import { FormattedMessage, useIntl } from "react-intl"
 import ActionsList from '@/components/flowit/actions-list';
 import ProgramDiagram from '@/components/flowit/program-diagram';
 import ProgramExecution from '@/components/flowit/program-execution';
+import { ProgramSchema } from '@/entities/ProgramSchema';
+import useProgram from '@/hooks/useProgram';
+import { useEffect } from 'react';
+const program = require("@/data/program") as ProgramSchema;
 
 
 const Home: NextPage = () => {
   const intl = useIntl();
+  const {handler} = useProgram()
+
+  const loadProgram = async () => {
+    await handler.setProgram(program);
+}
+
+  useEffect(() => {
+      loadProgram().catch(er => console.error(er));
+  }, [])
 
   return (
     <PublicLayout>
