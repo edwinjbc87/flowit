@@ -32,7 +32,7 @@ export function parseModule(moduleSchema:ModuleSchema): Diagram {
                     text: `${variable.name} <- ${variable.value}`, 
                     type: String(operation.type) as NodeType,
                     id: operation.id,
-                    x: window.innerWidth / 2 + (i * 200),
+                    x: window.innerWidth / 2 - 200,
                     y: operation.order * 100 + initOffset,
                 } as Node;
                 diagram.nodes.push(node);
@@ -42,7 +42,7 @@ export function parseModule(moduleSchema:ModuleSchema): Diagram {
                     text: operation.name, 
                     type: String(operation.type) as NodeType,
                     id: operation.id,
-                    x: window.innerWidth / 2 + (i * 200),
+                    x: window.innerWidth / 2 - 200,
                     y: operation.order * 100 + initOffset,
                 } as Node;
                 diagram.nodes.push(node);
@@ -52,7 +52,7 @@ export function parseModule(moduleSchema:ModuleSchema): Diagram {
                     text: operation.name, 
                     type: String(operation.type) as NodeType,
                     id: operation.id,
-                    x: window.innerWidth / 2 + (i * 200),
+                    x: window.innerWidth / 2 - 200,
                     y: operation.order * 100 + initOffset,
                 } as Node;
                 diagram.nodes.push(node);
@@ -62,7 +62,7 @@ export function parseModule(moduleSchema:ModuleSchema): Diagram {
                     text: operation.name, 
                     type: String(operation.type) as NodeType,
                     id: operation.id,
-                    x: window.innerWidth / 2 + (i * 200),
+                    x: window.innerWidth / 2 - 200,
                     y: operation.order * 100 + initOffset,
                 } as Node;
                 diagram.nodes.push(node);
