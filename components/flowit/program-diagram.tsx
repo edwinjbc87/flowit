@@ -11,38 +11,44 @@ import { NodeType } from "@/entities/Node"
 import ActionNode from "./action-node"
 import ActionSelector from "./action-selector"
 import FilesNavigation from "./files-navigation"
+import { parseSchema } from "@/libs/flowit/operations-parser"
+import { ProgramSchema } from "@/entities/ProgramSchema"
+const program = require("@/data/program") as ProgramSchema;
 
 export interface IProgram{
     diagram: Diagram;
 }
 
-const DynamicDiagramWrapperWithNoSSR = dynamic(
-    () => import('./diagram-wrapper'),
-    { ssr: false }
-)
-
 export default function ProgramDiagram() {
     const intl = useIntl();
 
-    const {diagram, handler} = useProgram();
+    const {project, handler} = useProgram();
     const [dlgSelAction, setDlgSelAction] = useState(false);
+    const [diagram, setDiagram] = useState<Diagram>();
+    
+    const loadProgram = async () => {
+        const progContent = program as ProgramSchema;
+        const project = parseSchema(progContent);
+        await handler.setProject(project)
+        setDiagram(handler.getCurrentModule().diagram);
+    }
 
     useEffect(() => {
-        handler.initDiagram().catch(er => console.error(er));
+        loadProgram().catch(er => console.error(er));
     }, [])
 
     const editNode = (id: string) => {
-        alert(id + " " + diagram.nodes.find(n=>String(n.id) == id)?.text);
+        alert(id + " " + diagram?.nodes.find(n=>String(n.id) == id)?.text)
     }
 
     return (
         <div>
             <FilesNavigation></FilesNavigation>
             <section className={styles.diagram}>
-                {diagram.nodes.length > 0 && <ReactFlow defaultNodes={diagram.nodes.map(n=>({
+                {diagram && diagram.nodes.length > 0 && <ReactFlow defaultNodes={diagram.nodes.map(n=>({
                     id: String(n.id),
                     data: {label: <ActionNode {...{id: String(n.id), type: n.type, text: n.text}}></ActionNode>},
-                    position: {x: 300, y: n.id * 100},
+                    position: {x: Number(String(n.x)), y: Number(String(n.y))},
                 }))} edges={diagram.connections.map(c => ({
                     id: String(c.id),
                     source: String(c.from),

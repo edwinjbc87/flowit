@@ -11,6 +11,12 @@ export enum ValueType {
     Array = "array",
 }
 
+export interface VariableSchema {
+    name: string;
+    type: ValueType;
+    value: any;
+} 
+
 export interface OperandSchema {
     type: OperandType;
 }

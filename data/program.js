@@ -1,21 +1,23 @@
-{
-    "main": "Program.flw",
+module.exports = {
+    "main": "Program",
     "modules": [
         {
-            "name": "Program.flw",
+            "name": "Program",
             "type": "program",
             "operations": [
                 {
                     "id": 0,
                     "order": 0,
                     "name": "Inicio",
-                    "type": "start"
+                    "type": "start",
+                    "level": 0
                 },
                 {
                     "id": 1,
                     "order": 4,
                     "name": "Fin",
-                    "type": "end"
+                    "type": "end",
+                    "level": 0
                 },
                 {
                     "id": 2,
@@ -26,7 +28,8 @@
                         "type": "integer",
                         "name": "a",
                         "value": "1"
-                    }
+                    },
+                    "level": 0
                 },
                 {
                     "id": 3,
@@ -37,7 +40,8 @@
                         "type": "integer",
                         "name": "b",
                         "value": "5"
-                    }
+                    },
+                    "level": 0
                 },
                 {
                     "id": 4,
@@ -54,7 +58,8 @@
                             "type": "variable",
                             "name": "b"
                         }
-                    }
+                    },
+                    "level": 0
                 }
             ]
         }

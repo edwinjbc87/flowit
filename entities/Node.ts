@@ -14,4 +14,6 @@ export interface Node {
     type: NodeType;
     name: string;
     text: string;
+    x?: number;
+    y?: number;
 }

@@ -1,16 +1,24 @@
 import { Diagram } from '@/entities/Diagram';
 import { NodeConnectionType } from '@/entities/NodeConnection';
+import { Project } from '@/entities/Project';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 export interface ProgramState {
     diagram: Diagram;
+    project: Project;
+    currentModuleIndex: number;
 }
 
 const initialState: ProgramState = {
     diagram: {
         nodes: [],
         connections: [],
-    }
+    },
+    project: {
+        main: '',
+        modules: [],
+    },
+    currentModuleIndex: 0,
 }
 
 export const programSlice = createSlice({
@@ -46,12 +54,19 @@ export const programSlice = createSlice({
             
             state.diagram.nodes.splice(state.diagram.nodes.length-1, 0, node)
             state.diagram.connections.splice(state.diagram.connections.length-1, 0, connections)
-        }
+        },
+        setProject: (state, action) => { 
+            state.project = action.payload; 
+            state.currentModuleIndex = state.project.modules.findIndex(module => module.name == state.project.main)
+        },
+        setCurrentModule: (state, action) => { 
+            state.currentModuleIndex = state.project.modules.findIndex(module => module.name == action.payload)
+        },
     },
     extraReducers: (builder)=>{
       //builder.addCase(refreshDiagram.fulfilled, (state, action) => { state.comentarios = [...action.payload]; });
     }
 })
 
-export const { setDiagram } = programSlice.actions
+export const { setDiagram, setProject, setCurrentModule } = programSlice.actions
 export default programSlice.reducer
