@@ -5,13 +5,13 @@ import { setDiagram, setProject, setProgram, setCurrentModule, setExecution } fr
 import { Project } from "@/entities/Project"
 import { ProgramExecution } from "@/entities/ProgramExecution"
 import { ProgramSchema } from "@/entities/ProgramSchema"
-import { runModule } from "@/libs/flowit/operations-execution"
 import { ModuleSchema } from "@/entities/ModuleSchema"
 import { BaseOperationSchema, OperationType } from "@/entities/BaseOperationSchema"
 import { DeclarationOperationSchema } from "@/entities/DeclarationOperationSchema"
 import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema"
 import { useRef, useState } from "react"
 import { OutputOperationSchema } from "@/entities/OutputOperationSchema"
+import { InputOperationSchema } from "@/entities/InputOperationSchema"
 
 export default function useProgram() {
     const dispatch = useAppDispatch();
@@ -66,6 +66,7 @@ export default function useProgram() {
                 break;
             }
         }
+        console.log(`Evaluated expression: ${expression.operation} = ${val}`);
         return val;
     }
 
@@ -90,7 +91,7 @@ export default function useProgram() {
                     let val = variable.value;
                     switch(variable.type) {
                         case ValueType.Number: {
-                            val = Number(variable.value);
+                            val = parseInt(variable.value);
                             break;
                         }
                         case ValueType.String: {
@@ -116,6 +117,37 @@ export default function useProgram() {
                     let val = String(await evaluateExpression((operation as OutputOperationSchema).expression));
                     
                     await dispatch(setExecution({ output: [...execution.output, val] }))
+                    break;
+                }
+                case OperationType.Input: {
+                    
+                    let msg = String((operation as InputOperationSchema).message);
+                    let variableName = String((operation as InputOperationSchema).variable);
+                    let val:any = await prompt(msg);
+
+                    const varSchema = (program.modules[currentModuleIndex].operations.find(op=>op.type == OperationType.Declaration && (op as DeclarationOperationSchema).variable.name == variableName) as DeclarationOperationSchema)?.variable;
+                    switch(varSchema.type) {
+                        case ValueType.Number: {
+                            val = parseInt(val);
+                            break;
+                        }
+                        case ValueType.String: {
+                            val = varSchema.value;
+                            break;
+                        }
+                        case ValueType.Boolean: {
+                            val = !!varSchema.value;
+                            break;
+                        }
+                        case ValueType.Array: {
+                            val = JSON.parse(varSchema.value);
+                            break;
+                        }
+                    }
+
+                    variables.current.set(variableName, val);
+                    
+                    await dispatch(setExecution({ variables: Object.fromEntries(variables.current) }))
                     break;
                 }
             }
