@@ -15,5 +15,5 @@ export default function useProgram() {
     const _setCurrentModule = async (name: string) => await dispatch(setCurrentModule(name));
     const getCurrentModule = () => project.modules[currentModuleIndex];
 
-    return {project, handler: {setDiagram: _setDiagram, setProject: _setProject, setCurrentModule: _setCurrentModule, getCurrentModule}}
+    return {project, diagram, handler: {setDiagram: _setDiagram, setProject: _setProject, setCurrentModule: _setCurrentModule, getCurrentModule}}
 }

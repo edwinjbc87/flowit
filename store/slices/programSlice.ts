@@ -58,9 +58,11 @@ export const programSlice = createSlice({
         setProject: (state, action) => { 
             state.project = action.payload; 
             state.currentModuleIndex = state.project.modules.findIndex(module => module.name == state.project.main)
+            state.diagram = state.project.modules[state.currentModuleIndex].diagram
         },
         setCurrentModule: (state, action) => { 
             state.currentModuleIndex = state.project.modules.findIndex(module => module.name == action.payload)
+            state.diagram = state.project.modules[state.currentModuleIndex].diagram
         },
     },
     extraReducers: (builder)=>{

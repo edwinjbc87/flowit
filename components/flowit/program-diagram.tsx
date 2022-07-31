@@ -22,15 +22,13 @@ export interface IProgram{
 export default function ProgramDiagram() {
     const intl = useIntl();
 
-    const {project, handler} = useProgram();
+    const {project, diagram, handler} = useProgram();
     const [dlgSelAction, setDlgSelAction] = useState(false);
-    const [diagram, setDiagram] = useState<Diagram>();
     
     const loadProgram = async () => {
         const progContent = program as ProgramSchema;
         const project = parseSchema(progContent);
-        await handler.setProject(project)
-        setDiagram(handler.getCurrentModule().diagram);
+        await handler.setProject(project);
     }
 
     useEffect(() => {
