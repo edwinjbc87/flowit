@@ -36,6 +36,7 @@ export default function ProgramDiagram() {
                 {diagram && diagram.nodes.length > 0 && <ReactFlow defaultNodes={diagram.nodes.map(n=>({
                     id: String(n.id),
                     data: {label: <ActionNode {...{id: String(n.id), type: n.type, text: n.text}}></ActionNode>},
+                    style: {width: n.width},
                     position: {x: Number(String(n.x)), y: Number(String(n.y))},
                 }))} edges={diagram.connections.map(c => ({
                     id: String(c.id),

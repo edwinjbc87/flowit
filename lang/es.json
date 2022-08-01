@@ -2,6 +2,7 @@
     "pages.index.subtitle": "Una herramienta para ayudar a los estudiantes a aprender a programar",
     "playground.actions": "Acciones",
     "playground.program": "Programa",
+    "playground.pickanaction": "Seleccione una acción...",
     "playground.run": "Ejecutar",    
     "playground.running": "Ejecutando...",    
     "playground.start": "Inicio",
