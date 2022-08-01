@@ -27,53 +27,62 @@ export function parseModule(moduleSchema:ModuleSchema): Diagram {
             let operation = operations[i];
             //#region Create node
             if(operation.type === OperationType.Declaration) {
-                let variable = (operation as DeclarationOperationSchema).variable;
                 let node = {
-                    text: `${variable.name} <- ${variable.value}`, 
+                    text: operation.name, 
+                    name: operation.name,
                     type: String(operation.type) as NodeType,
                     id: operation.id,
                     x: window.innerWidth / 2 - 200,
                     y: operation.order * 100 + initOffset,
+                    width: 400,
                 } as Node;
                 diagram.nodes.push(node);
             }
             if(operation.type === OperationType.Start) {
                 let node = {
                     text: operation.name, 
+                    name: operation.name,
                     type: String(operation.type) as NodeType,
                     id: operation.id,
                     x: window.innerWidth / 2 - 200,
                     y: operation.order * 100 + initOffset,
+                    width: 400,
                 } as Node;
                 diagram.nodes.push(node);
             }
             if(operation.type === OperationType.End) {
                 let node = {
                     text: operation.name, 
+                    name: operation.name,
                     type: String(operation.type) as NodeType,
                     id: operation.id,
                     x: window.innerWidth / 2 - 200,
                     y: operation.order * 100 + initOffset,
+                    width: 400,
                 } as Node;
                 diagram.nodes.push(node);
             }
             if(operation.type === OperationType.Output) {
                 let node = {
                     text: operation.name, 
+                    name: operation.name,
                     type: String(operation.type) as NodeType,
                     id: operation.id,
                     x: window.innerWidth / 2 - 200,
                     y: operation.order * 100 + initOffset,
+                    width: 400,
                 } as Node;
                 diagram.nodes.push(node);
             }
             if(operation.type === OperationType.Input) {
                 let node = {
                     text: operation.name, 
+                    name: operation.name,
                     type: String(operation.type) as NodeType,
                     id: operation.id,
                     x: window.innerWidth / 2 - 200,
                     y: operation.order * 100 + initOffset,
+                    width: 400,
                 } as Node;
                 diagram.nodes.push(node);
             }

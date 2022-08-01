@@ -6,6 +6,7 @@ export enum OperandType {
 
 export enum ValueType {
     String = "string",
+    Integer = "integer",
     Number = "number",
     Boolean = "boolean",
     Array = "array",
@@ -14,7 +15,7 @@ export enum ValueType {
 export interface VariableSchema {
     name: string;
     type: ValueType;
-    value: any;
+    value: ExpressionSchema;
 } 
 
 export interface OperandSchema {

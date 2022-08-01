@@ -4,8 +4,7 @@ import {BsCircle, BsCircleFill, BsQuestionCircleFill, BsQuestionDiamond, BsBoxAr
 import {FiArrowLeft} from "react-icons/fi"
 import {TiArrowLoop} from "react-icons/ti"
 import {TbVariable} from "react-icons/tb"
-import {AiOutlineExport} from "react-icons/ai"
-import {MdInput} from "react-icons/md"
+import {IoExitOutline, IoEnterOutline} from "react-icons/io5"
 
 export interface IActionIconProps{
     type: NodeType;
@@ -29,11 +28,11 @@ export default function ActionIcon(props:IActionIconProps&React.HTMLAttributes<H
                 break;
             }
             case NodeType.Input: {
-                setIcon(<MdInput size={24} className={props.className} />);
+                setIcon(<IoEnterOutline size={24} className={props.className} />);
                 break;
             }
             case NodeType.Output: {
-                setIcon(<AiOutlineExport size={24} className={props.className} />);
+                setIcon(<IoExitOutline size={24} className={props.className} />);
                 break;
             }
             case NodeType.Loop: {

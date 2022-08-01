@@ -25,9 +25,11 @@ module.exports = {
                     "name": "Declarar a",
                     "type": "declaration",
                     "variable": {
-                        "type": "number",
+                        "type": "integer",
                         "name": "a",
-                        "value": "0"
+                        "value": {
+                            "left": 0,
+                        }
                     },
                     "level": 0
                 },
@@ -37,9 +39,11 @@ module.exports = {
                     "name": "Declarar b",
                     "type": "declaration",
                     "variable": {
-                        "type": "number",
+                        "type": "integer",
                         "name": "b",
-                        "value": "0"
+                        "value": {
+                            "left": 0,
+                        }
                     },
                     "level": 0
                 },
@@ -67,14 +71,21 @@ module.exports = {
                     "name": "Imprimir suma",
                     "type": "output",
                     "expression": {
-                        "operation": "sum",
+                        "operation": "concat",
                         "left": {
-                            "operation": "variable",
-                            "left": "a"
+                            "operation": "value",
+                            "left": "Suma: "
                         },
                         "right": {
-                            "operation": "variable",
-                            "left": "b"
+                            "operation": "sum",
+                            "left": {
+                                "operation": "variable",
+                                "left": "a"
+                            },
+                            "right": {
+                                "operation": "variable",
+                                "left": "b"
+                            }
                         }
                     },
                     "level": 0
