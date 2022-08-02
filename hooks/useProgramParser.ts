@@ -10,6 +10,7 @@ import { ProgramSchema } from "@/entities/ProgramSchema"
 import { Project, Module } from "@/entities/Project"
 import { Dimension } from "@/entities/Dimension"
 import { useIntl } from "react-intl"
+import { MdOutlineCatchingPokemon } from "react-icons/md"
 
 
 export function useProgramParser() {
@@ -88,16 +89,21 @@ export function useProgramParser() {
     }
     
     function parseModule(moduleSchema:ModuleSchema): Diagram {
-        const dg:Diagram = parseScope(moduleSchema.operations);
+        const dg:Diagram = parseScope(moduleSchema.operations, (document.querySelector("#diagram")?.clientWidth)??0);
         return dg;
     }
     
-    function parseScope(operations:BaseOperationSchema[], parentNode?:string, offsetX?: number, offsetY?: number): Diagram {
+    function parseScope(operations:BaseOperationSchema[], scopeWidth: number, parentNode?:string, offsetY?: number): Diagram {
         const diagram: Diagram = {nodes: [], connections: [], dimension: {width: 0, height: 0}};
         const gap = parseInt(String(process.env.DIAGRAM_NODE_GAP_WIDTH))
         const edgeHeight = parseInt(String(process.env.DIAGRAM_NODE_EDGE_HEIGHT))
         let offset = gap + (offsetY?offsetY:0);
-        const opers = (operations && Array.isArray(operations)) ? operations.sort((a, b) => a.order - b.order) : [];
+        let opers:BaseOperationSchema[] = [];
+        try{
+            opers = operations.sort((a, b) => a.order - b.order);
+        }catch{
+            opers = operations;
+        }
     
         for(let i = 0; i < opers.length; i++) {
             let operation = opers[i];
@@ -109,7 +115,7 @@ export function useProgramParser() {
                 name: operation.name,
                 type: String(operation.type) as NodeType,
                 id: String(operation.id),
-                x: (offsetX?offsetX:0) + gap,
+                x: (scopeWidth - size.width) / 2,
                 y: offset,
                 width: size.width,
                 height: size.height
@@ -130,16 +136,16 @@ export function useProgramParser() {
             if(operation.type === OperationType.Loop) {
                 const loop = operation as LoopOperationSchema;
     
-                const dg = parseScope(loop.operations, String(operation.id), 0, 50);
+                const dg = parseScope(loop.operations, size.width,String(operation.id), 50);
                 diagram.nodes = diagram.nodes.concat(dg.nodes);
                 diagram.connections = diagram.connections.concat(dg.connections);
             } else if(operation.type === OperationType.Condition) {
                 const condition = operation as ConditionOperationSchema;
     
-                const dg = parseScope(condition.yes, String(operation.id+'_yes'), 0, 50);
-                const dg2 = parseScope(condition.no, String(operation.id+'_no'), 0, 50);
+                const dg = parseScope(condition.yes, (size.width - 3*gap) / 2, String(operation.id+'_yes'), 50);
+                const dg2 = parseScope(condition.no, (size.width - 3*gap) / 2, String(operation.id+'_no'), 50);
     
-                node.width = dg.dimension.width + dg2.dimension.width + 5*gap;
+                node.width = dg.dimension.width + dg2.dimension.width + 3*gap;
                 const idxNode = diagram.nodes.findIndex(n => n.id === String(operation.id));
                 diagram.nodes[idxNode].width = node.width;
                 diagram.nodes[idxNode].height = Math.max(dg.dimension.height, dg2.dimension.height) + 100;
@@ -150,7 +156,7 @@ export function useProgramParser() {
                     name: intl.formatMessage({id: 'actions.yes'}), 
                     type: NodeType.Yes,
                     id: operation.id + '_yes',
-                    x: (offsetX?offsetX:0) + gap,
+                    x: gap,
                     y: gap + 50,
                     width: dg.dimension.width,
                     height: dg.dimension.height,
@@ -162,7 +168,7 @@ export function useProgramParser() {
                     name: intl.formatMessage({id: 'actions.no'}), 
                     type: NodeType.No,
                     id: operation.id + '_no',
-                    x: (offsetX?offsetX:0) + dg.dimension.width + 4*gap,
+                    x: 2*gap + dg.dimension.width,
                     y: gap + 50,
                     width: dg2.dimension.width,
                     height: dg2.dimension.height,

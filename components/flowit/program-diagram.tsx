@@ -12,6 +12,10 @@ import ActionSelector from "./action-selector"
 import FilesNavigation from "./files-navigation"
 import { ProgramSchema } from "@/entities/ProgramSchema"
 import { Node, Edge } from 'react-flow-renderer'
+import BaseActionConfig from "./action-configs/base-action-config"
+import { BaseOperationSchema, OperationType } from "@/entities/BaseOperationSchema"
+import DeclarationActionConfig from "./action-configs/declaration-action-config"
+import { DeclarationOperationSchema } from "@/entities/DeclarationOperationSchema"
 const program = require("@/data/program") as ProgramSchema;
 
 export interface IProgram{
@@ -21,13 +25,15 @@ export interface IProgram{
 export default function ProgramDiagram() {
     const intl = useIntl();
     
-    const {diagram} = useProgram();
+    const {diagram, handler} = useProgram();
     const [dlgSelAction, setDlgSelAction] = useState(false);
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
+    const [selectedOperation, setSelectedOperation] = useState<BaseOperationSchema|null>(null);
 
     const editNode = (id: string) => {
-        alert(id + " " + diagram?.nodes.find(n=>String(n.id) == id)?.text)
+        console.log(id)
+        setSelectedOperation(handler.getOperation(id))
     }
 
     useEffect(() => {
@@ -58,13 +64,16 @@ export default function ProgramDiagram() {
     return (
         <div>
             <FilesNavigation></FilesNavigation>
-            <section className={styles.diagram}>
-                {diagram && diagram.nodes.length > 0 && <ReactFlow defaultNodes={nodes} edges={edges} nodesDraggable={true} onEdgeClick={()=>setDlgSelAction(true)} onNodeDoubleClick={(ev, n)=>editNode(n.id)}>
+            <section className={styles.diagram} id="diagram">
+                {diagram && diagram.nodes.length > 0 && <ReactFlow defaultNodes={nodes} edges={edges} nodesDraggable={true} onEdgeClick={()=>setDlgSelAction(true)} onNodeClick={(ev, n)=>editNode(n.id)}>
                     <Background />
                     <Controls />
                 </ReactFlow>}
             </section>
             <ActionSelector show={dlgSelAction} onDismiss={()=>{setDlgSelAction(false)}}></ActionSelector>
+            <BaseActionConfig show={selectedOperation!=null} onDismiss={()=>setSelectedOperation(null)}>
+                {selectedOperation?.type == OperationType.Declaration && <DeclarationActionConfig operation={selectedOperation as DeclarationOperationSchema}></DeclarationActionConfig>}
+            </BaseActionConfig>
         </div>
     );
 }

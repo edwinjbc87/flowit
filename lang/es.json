@@ -1,5 +1,6 @@
 {
     "pages.index.subtitle": "Una herramienta para ayudar a los estudiantes a aprender a programar",
+    "general.operationConfiguration": "Configuración de la operación",
     "playground.actions": "Acciones",
     "playground.program": "Programa",
     "playground.pickanaction": "Seleccione una acción...",

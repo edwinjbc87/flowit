@@ -34,6 +34,31 @@ export default function useProgram() {
     }
     const _setCurrentModule = async (name: string) => await dispatch(setCurrentModule(name))
     const getCurrentModule = () => project.modules[currentModuleIndex]
+    const getOperation = (id: string) => {
+        return findOperation(id, program.modules[currentModuleIndex].operations);
+    }
+    const findOperation = (id: string, scope:BaseOperationSchema[]) => {
+        for(const operation of scope) {
+            if(String(operation.id) === id) {
+                return operation
+            } else if(operation.type == OperationType.Loop) {
+                const found = findOperation(id, (operation as LoopOperationSchema).operations)
+                if(found) {
+                    return found
+                }
+            } else if(operation.type == OperationType.Condition) {
+                let found = findOperation(id, (operation as ConditionOperationSchema).yes)
+                if(!found) {
+                    found = findOperation(id, (operation as ConditionOperationSchema).no)
+                    if(found){
+                        return found
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
     const variables = useRef(new Map())
 
     const evaluateExpression = async (expression: ExpressionSchema) => {
@@ -58,55 +83,64 @@ export default function useProgram() {
                 break
             }
             case "div": {
-                const left = await evaluateExpression(expression.left);
-                const right = await evaluateExpression(expression.right);
-                val = left / right;
-                break;
+                const left = await evaluateExpression(expression.left)
+                const right = await evaluateExpression(expression.right)
+                val = left / right
+                break
             }
             case "and": {
-                const left = await evaluateExpression(expression.left);
-                const right = await evaluateExpression(expression.right);
-                val = left && right;
-                break;
+                const left = await evaluateExpression(expression.left)
+                const right = await evaluateExpression(expression.right)
+                val = left && right
+                break
             }
             case "or": {
-                const left = await evaluateExpression(expression.left);
-                const right = await evaluateExpression(expression.right);
-                val = left || right;
+                const left = await evaluateExpression(expression.left)
+                const right = await evaluateExpression(expression.right)
+                val = left || right
+                break
             }
             case "not": {
-                const left = await evaluateExpression(expression.left);
-                val = !left;
+                const left = await evaluateExpression(expression.left)
+                val = !left
+                break
             }
             case "eq": {
-                const left = await evaluateExpression(expression.left);
-                const right = await evaluateExpression(expression.right);
-                val = left === right;
+                const left = await evaluateExpression(expression.left)
+                const right = await evaluateExpression(expression.right)
+                val = (left === right)
+                break
             }
             case "neq": {
-                const left = await evaluateExpression(expression.left);
-                const right = await evaluateExpression(expression.right);
-                val = left !== right;
+                const left = await evaluateExpression(expression.left)
+                const right = await evaluateExpression(expression.right)
+                val = (left !== right)
+                break
             }
             case "lt": {
-                const left = await evaluateExpression(expression.left);
-                const right = await evaluateExpression(expression.right);
-                val = left < right;
+                const left = await evaluateExpression(expression.left)
+                const right = await evaluateExpression(expression.right)
+                val = (left < right)
+                break
             }
             case "gt": {
-                const left = await evaluateExpression(expression.left);
-                const right = await evaluateExpression(expression.right);
-                val = left > right;
+                const left = await evaluateExpression(expression.left)
+                const right = await evaluateExpression(expression.right)
+
+                val = (left > right)
+                break
             }
             case "le": {
-                const left = await evaluateExpression(expression.left);
-                const right = await evaluateExpression(expression.right);
-                val = left <= right;
+                const left = await evaluateExpression(expression.left)
+                const right = await evaluateExpression(expression.right)
+                val = (left <= right)
+                break
             }
             case "ge": {
-                const left = await evaluateExpression(expression.left);
-                const right = await evaluateExpression(expression.right);
-                val = left >= right;
+                const left = await evaluateExpression(expression.left)
+                const right = await evaluateExpression(expression.right)
+                val = (left >= right)
+                break
             }
             case "concat": {
                 const left = await evaluateExpression(expression.left)
@@ -116,11 +150,12 @@ export default function useProgram() {
             }
             case "variable": {
                 val = variables.current.get(expression.left)
-                console.log(execution.variables)
+                console.log(expression.left, val)
                 break
             }
             default: {
                 val = expression.left
+                break
             }
         }
         return val
@@ -195,7 +230,7 @@ export default function useProgram() {
 
                     variables.current.set(variableName, await getValue(variableName, val))
                     await dispatch(setExecutionVariable({ name: variableName, value: variables.current.get(variableName) }))
-                    break;
+                    break
                 }
                 case OperationType.Input: {
                     
@@ -206,20 +241,20 @@ export default function useProgram() {
                     variables.current.set(variableName, await getValue(variableName, {left: val}))
                     
                     await dispatch(setExecutionVariable({ name: variableName, value: variables.current.get(variableName) }))
-                    break;
+                    break
                 }
                 case OperationType.Condition: {
                     let yesOperations = (operation as ConditionOperationSchema).yes
                     let noOperations = (operation as ConditionOperationSchema).no
                     let condition = (operation as ConditionOperationSchema).condition
-
+                    
                     if(await evaluateExpression(condition)) {
                         await runScope(yesOperations)
                     } else {
                         await runScope(noOperations)
                     }
                     
-                    break;
+                    break
                 }
                 case OperationType.Loop: {
                     let operations = (operation as LoopOperationSchema).operations
@@ -229,12 +264,12 @@ export default function useProgram() {
                         await runScope(operations)
                     }
                     
-                    break;
+                    break
                 }
             }
             await new Promise(resolve => setTimeout(resolve, 500))
         }
     }
 
-    return {program, project, diagram, execution, handler: {setDiagram: _setDiagram, setProject: _setProject, setCurrentModule: _setCurrentModule, setProgram: _setProgram, getCurrentModule, runProgram}}
+    return {program, project, diagram, execution, handler: {setDiagram: _setDiagram, setProject: _setProject, setCurrentModule: _setCurrentModule, setProgram: _setProgram, getCurrentModule, runProgram, getOperation}}
 }
