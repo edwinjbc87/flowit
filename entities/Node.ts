@@ -2,19 +2,23 @@ export enum NodeType {
     Start = 'start',
     End = 'end',
     Declaration = 'declaration',
-    Asignment = 'asignment',
+    Assignment = 'assignment',
     Input = 'input',
     Output = 'output',
     Condition = 'condition',
     Loop = 'loop',
+    Yes = 'yes',
+    No = 'no'
 }
 
 export interface Node {
-    id: number;
+    id: string;
     type: NodeType;
     name: string;
     text: string;
     x?: number;
     y?: number;
     width?: number;
+    height?: number;
+    parentNode?: string;
 }
