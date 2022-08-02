@@ -2,9 +2,10 @@ import { Component, useEffect, useState } from "react";
 import { NodeType } from "@/entities/Node";
 import {BsCircle, BsCircleFill, BsQuestionCircleFill, BsQuestionDiamond, BsBoxArrowInRight, BsBoxArrowRight} from "react-icons/bs"
 import {FiArrowLeft} from "react-icons/fi"
+import {FaCheck} from "react-icons/fa"
 import {TiArrowLoop} from "react-icons/ti"
 import {TbVariable} from "react-icons/tb"
-import {IoExitOutline, IoEnterOutline} from "react-icons/io5"
+import {IoExitOutline, IoEnterOutline, IoClose} from "react-icons/io5"
 
 export interface IActionIconProps{
     type: NodeType;
@@ -24,27 +25,35 @@ export default function ActionIcon(props:IActionIconProps&React.HTMLAttributes<H
                 break;
             }
             case NodeType.Condition: {
-                setIcon(<BsQuestionDiamond size={24} className={props.className} />);
+                setIcon(<BsQuestionDiamond size={24} className={props.className} />)
                 break;
             }
             case NodeType.Input: {
-                setIcon(<IoEnterOutline size={24} className={props.className} />);
+                setIcon(<IoEnterOutline size={24} className={props.className} />)
                 break;
             }
             case NodeType.Output: {
-                setIcon(<IoExitOutline size={24} className={props.className} />);
+                setIcon(<IoExitOutline size={24} className={props.className} />)
                 break;
             }
             case NodeType.Loop: {
-                setIcon(<TiArrowLoop size={24} className={props.className} />);
+                setIcon(<TiArrowLoop size={24} className={props.className} />)
                 break;
             }
             case NodeType.Assignment: {
-                setIcon(<FiArrowLeft size={24} className={props.className} />);
+                setIcon(<FiArrowLeft size={24} className={props.className} />)
                 break;
             }
             case NodeType.Declaration: {
-                setIcon(<TbVariable size={24} className={props.className} />);
+                setIcon(<TbVariable size={24} className={props.className} />)
+                break;
+            }
+            case NodeType.Yes: {
+                setIcon(<FaCheck color="#00cc44" size={24} className={props.className} />)
+                break;
+            }
+            case NodeType.No: {
+                setIcon(<IoClose color="#ff3333" size={24} className={props.className} />)
                 break;
             }
         }

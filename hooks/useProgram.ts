@@ -14,6 +14,7 @@ import { OutputOperationSchema } from "@/entities/OutputOperationSchema"
 import { InputOperationSchema } from "@/entities/InputOperationSchema"
 import { ConditionOperationSchema } from "@/entities/ConditionOperationSchema"
 import { LoopOperationSchema } from "@/entities/LoopOperationSchema"
+import { useProgramParser } from "hooks/useProgramParser"
 
 export default function useProgram() {
     const dispatch = useAppDispatch()
@@ -22,10 +23,15 @@ export default function useProgram() {
     const currentModuleIndex = useSelector((state: RootState) => state.program.currentModuleIndex)
     const diagram = useSelector<RootState, Diagram>(state => state.program.diagram)
     const execution = useSelector<RootState, ProgramExecution>(state => state.program.execution)
+    const { parseSchema } = useProgramParser()
 
     const _setDiagram = async (diagram: Diagram) => await dispatch(setDiagram(diagram))
     const _setProject = async (project: Project) => await dispatch(setProject(project))
-    const _setProgram = async (program: ProgramSchema) => await dispatch(setProgram(program))
+    const _setProgram = async (_program: ProgramSchema) => {
+        const _project = parseSchema(_program)
+        await dispatch(setProgram(_program))
+        await dispatch(setProject(_project))
+    }
     const _setCurrentModule = async (name: string) => await dispatch(setCurrentModule(name))
     const getCurrentModule = () => project.modules[currentModuleIndex]
     const variables = useRef(new Map())

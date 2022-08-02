@@ -7,6 +7,8 @@
     "playground.running": "Running...",
     "playground.variable": "Variable",
     "playground.value": "Value",
+    "actions.yes": "Yes",
+    "actions.no": "No",
     "actions.start": "Start",
     "actions.end": "End",
     "actions.input": "Input",

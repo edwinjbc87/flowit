@@ -4,7 +4,6 @@ import { ProgramExecution } from '@/entities/ProgramExecution';
 import { ProgramSchema } from '@/entities/ProgramSchema';
 import { Project } from '@/entities/Project';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { parseSchema } from "@/libs/flowit/operations-parser"
 
 export interface ProgramState {
     diagram: Diagram;
@@ -18,6 +17,7 @@ const initialState: ProgramState = {
     diagram: {
         nodes: [],
         connections: [],
+        dimension: {width: 0, height: 0}
     },
     project: {
         main: '',
@@ -90,9 +90,6 @@ export const programSlice = createSlice({
         },
         setProgram: (state, action) => {
             state.program = action.payload
-            state.project = parseSchema(state.program)
-            state.currentModuleIndex = state.project.modules.findIndex(module => module.name == state.project.main)
-            state.diagram = state.project.modules[state.currentModuleIndex].diagram
         }
     },
     extraReducers: (builder)=>{

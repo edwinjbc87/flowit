@@ -20,7 +20,7 @@ export interface IProgram{
 
 export default function ProgramDiagram() {
     const intl = useIntl();
-
+    
     const {diagram} = useProgram();
     const [dlgSelAction, setDlgSelAction] = useState(false);
     const [nodes, setNodes] = useState<Node[]>([]);

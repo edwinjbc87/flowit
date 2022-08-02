@@ -7,10 +7,12 @@ export enum NodeType {
     Output = 'output',
     Condition = 'condition',
     Loop = 'loop',
+    Yes = 'yes',
+    No = 'no'
 }
 
 export interface Node {
-    id: number;
+    id: string;
     type: NodeType;
     name: string;
     text: string;
@@ -18,5 +20,5 @@ export interface Node {
     y?: number;
     width?: number;
     height?: number;
-    parentNode?: number;
+    parentNode?: string;
 }
