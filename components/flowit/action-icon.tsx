@@ -39,7 +39,7 @@ export default function ActionIcon(props:IActionIconProps&React.HTMLAttributes<H
                 setIcon(<TiArrowLoop size={24} className={props.className} />);
                 break;
             }
-            case NodeType.Asignment: {
+            case NodeType.Assignment: {
                 setIcon(<FiArrowLeft size={24} className={props.className} />);
                 break;
             }

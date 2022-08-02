@@ -4,6 +4,8 @@ const nextConfig = {
   swcMinify: true,
   env: {
     API_URL: process.env.API_URL,
+    DIAGRAM_NODE_WIDTH: 200,
+    DIAGRAM_NODE_GAP_WIDTH: 15
   },
   i18n: {
     locales: ['es', 'en'],

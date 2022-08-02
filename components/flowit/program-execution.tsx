@@ -27,8 +27,8 @@ export default function ProgramExecution(){
                     <table className="table min-w-full">
                         <thead className="border-b">
                             <tr>
-                                <th scope="col" className="text-sm font-medium text-gray-900 px-3 py-4 text-left w-1/3">Variable</th>
-                                <th scope="col" className="text-sm font-medium text-gray-900 px-3 py-4 text-left w-2/3">Valor</th>
+                                <th scope="col" className="text-sm font-medium text-gray-900 px-3 py-4 text-left w-1/3">{intl.formatMessage({id: "playground.variable"})}</th>
+                                <th scope="col" className="text-sm font-medium text-gray-900 px-3 py-4 text-left w-2/3">{intl.formatMessage({id: "playground.value"})}</th>
                             </tr>
                         </thead>
                         <tbody className="overflow-y-scroll">

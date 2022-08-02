@@ -83,7 +83,7 @@ export const programSlice = createSlice({
             state.execution = { ...state.execution, ...action.payload }
         },
         setExecutionVariable: (state, action) => {
-            state.execution.variables[action.payload.key] = action.payload.value
+            state.execution.variables[action.payload.name] = action.payload.value
         },
         addExecutionOutput: (state, action) => {
             state.execution.output.push(action.payload)

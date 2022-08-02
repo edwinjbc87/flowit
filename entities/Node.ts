@@ -2,7 +2,7 @@ export enum NodeType {
     Start = 'start',
     End = 'end',
     Declaration = 'declaration',
-    Asignment = 'asignment',
+    Assignment = 'assignment',
     Input = 'input',
     Output = 'output',
     Condition = 'condition',
@@ -17,4 +17,6 @@ export interface Node {
     x?: number;
     y?: number;
     width?: number;
+    height?: number;
+    parentNode?: number;
 }

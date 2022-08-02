@@ -2,7 +2,7 @@ export enum OperationType {
     Start = 'start',
     End = 'end',
     Declaration = 'declaration',
-    Asignment = 'asignment',
+    Assignment = 'assignment',
     Input = 'input',
     Output = 'output',
     Condition = 'condition',

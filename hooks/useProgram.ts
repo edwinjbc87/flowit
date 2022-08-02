@@ -1,7 +1,7 @@
 import { RootState, useAppDispatch } from "store"
 import { useSelector } from "react-redux"
 import { Diagram } from "@/entities/Diagram"
-import { setDiagram, setProject, setProgram, setCurrentModule, setExecution } from "store/slices/programSlice"
+import { setDiagram, setProject, setProgram, setCurrentModule, setExecution, addExecutionOutput, setExecutionVariable } from "store/slices/programSlice"
 import { Project } from "@/entities/Project"
 import { ProgramExecution } from "@/entities/ProgramExecution"
 import { ProgramSchema } from "@/entities/ProgramSchema"
@@ -57,6 +57,51 @@ export default function useProgram() {
                 val = left / right;
                 break;
             }
+            case "and": {
+                const left = await evaluateExpression(expression.left);
+                const right = await evaluateExpression(expression.right);
+                val = left && right;
+                break;
+            }
+            case "or": {
+                const left = await evaluateExpression(expression.left);
+                const right = await evaluateExpression(expression.right);
+                val = left || right;
+            }
+            case "not": {
+                const left = await evaluateExpression(expression.left);
+                val = !left;
+            }
+            case "eq": {
+                const left = await evaluateExpression(expression.left);
+                const right = await evaluateExpression(expression.right);
+                val = left === right;
+            }
+            case "neq": {
+                const left = await evaluateExpression(expression.left);
+                const right = await evaluateExpression(expression.right);
+                val = left !== right;
+            }
+            case "lt": {
+                const left = await evaluateExpression(expression.left);
+                const right = await evaluateExpression(expression.right);
+                val = left < right;
+            }
+            case "gt": {
+                const left = await evaluateExpression(expression.left);
+                const right = await evaluateExpression(expression.right);
+                val = left > right;
+            }
+            case "le": {
+                const left = await evaluateExpression(expression.left);
+                const right = await evaluateExpression(expression.right);
+                val = left <= right;
+            }
+            case "ge": {
+                const left = await evaluateExpression(expression.left);
+                const right = await evaluateExpression(expression.right);
+                val = left >= right;
+            }
             case "concat": {
                 const left = await evaluateExpression(expression.left)
                 const right = await evaluateExpression(expression.right)
@@ -65,6 +110,7 @@ export default function useProgram() {
             }
             case "variable": {
                 val = variables.current.get(expression.left)
+                console.log(execution.variables)
                 break
             }
             default: {
@@ -125,26 +171,24 @@ export default function useProgram() {
                     let val = variable.value;
                     
                     variables.current.set(variable.name, await getValue(variable.name, val))
-
-                    await dispatch(setExecution({ variables: Object.fromEntries(variables.current) }))
+                    await dispatch(setExecutionVariable({ name: variable.name, value: variables.current.get(variable.name) }))
                     break
                 }
                 case OperationType.Output: {
                     
                     let val = String(await evaluateExpression((operation as OutputOperationSchema).expression))
                     
-                    await dispatch(setExecution({ output: [...execution.output, val] }))
+                    await dispatch(addExecutionOutput(val))
                     break
                 }
-                case OperationType.Asignment: {
+                case OperationType.Assignment: {
                     
                     let msg = String((operation as InputOperationSchema).message)
                     let variableName = String((operation as InputOperationSchema).variable)
                     let val:any = String(await evaluateExpression((operation as OutputOperationSchema).expression))
 
                     variables.current.set(variableName, await getValue(variableName, val))
-                    
-                    await dispatch(setExecution({ variables: Object.fromEntries(variables.current) }))
+                    await dispatch(setExecutionVariable({ name: variableName, value: variables.current.get(variableName) }))
                     break;
                 }
                 case OperationType.Input: {
@@ -155,7 +199,7 @@ export default function useProgram() {
 
                     variables.current.set(variableName, await getValue(variableName, {left: val}))
                     
-                    await dispatch(setExecution({ variables: Object.fromEntries(variables.current) }))
+                    await dispatch(setExecutionVariable({ name: variableName, value: variables.current.get(variableName) }))
                     break;
                 }
                 case OperationType.Condition: {

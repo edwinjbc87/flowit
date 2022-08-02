@@ -1,8 +1,8 @@
 module.exports = {
-    "main": "Program",
+    "main": "Programa",
     "modules": [
         {
-            "name": "Program",
+            "name": "Programa",
             "type": "program",
             "operations": [
                 {
