@@ -28,7 +28,8 @@ module.exports = {
                         "type": "integer",
                         "name": "a",
                         "value": {
-                            "left": 0,
+                            "operation": "value",
+                            "left": 0
                         }
                     },
                     "level": 0
@@ -42,7 +43,8 @@ module.exports = {
                         "type": "integer",
                         "name": "b",
                         "value": {
-                            "left": 0,
+                            "operation": "value",
+                            "left": 0
                         }
                     },
                     "level": 0
@@ -113,59 +115,59 @@ module.exports = {
                             "left": 10
                         }
                     },
-                    "yes": [
-                        {
-                            "id": 8,
-                            "order": 0,
-                            "name": "Imprimir si es mayor a 10",
-                            "type": "output",
-                            "expression": {
-                                "operation": "concat",
-                                "left": {
-                                    "operation": "value",
-                                    "left": "Si es mayor a 10: "
-                                },
-                                "right": {
-                                    "operation": "sum",
-                                    "left": {
-                                        "operation": "variable",
-                                        "left": "a"
-                                    },
-                                    "right": {
-                                        "operation": "variable",
-                                        "left": "b"
-                                    }
-                                }
-                            }
-                        }
-                    ],
-                    "no": [
-                        {
-                            "id": 9,
-                            "order": 0,
-                            "name": "Imprimir es menor o igual a 10",
-                            "type": "output",
-                            "expression": {
-                                "operation": "concat",
-                                "left": {
-                                    "operation": "value",
-                                    "left": "Es menor o igual a 10: "
-                                },
-                                "right": {
-                                    "operation": "sum",
-                                    "left": {
-                                        "operation": "variable",
-                                        "left": "a"
-                                    },
-                                    "right": {
-                                        "operation": "variable",
-                                        "left": "b"
-                                    }
-                                }
-                            }
-                        }
-                    ],
                     "level": 0,
+                },
+                {
+                    "id": 8,
+                    "order": 0,
+                    "name": "Imprimir si es mayor a 10",
+                    "type": "output",
+                    "expression": {
+                        "operation": "concat",
+                        "left": {
+                            "operation": "value",
+                            "left": "Si es mayor a 10: "
+                        },
+                        "right": {
+                            "operation": "sum",
+                            "left": {
+                                "operation": "variable",
+                                "left": "a"
+                            },
+                            "right": {
+                                "operation": "variable",
+                                "left": "b"
+                            }
+                        }
+                    },
+                    "level": 1,
+                    "parent": "7_yes"
+                },
+                {
+                    "id": 9,
+                    "order": 0,
+                    "name": "Imprimir es menor o igual a 10",
+                    "type": "output",
+                    "expression": {
+                        "operation": "concat",
+                        "left": {
+                            "operation": "value",
+                            "left": "Es menor o igual a 10: "
+                        },
+                        "right": {
+                            "operation": "sum",
+                            "left": {
+                                "operation": "variable",
+                                "left": "a"
+                            },
+                            "right": {
+                                "operation": "variable",
+                                "left": "b"
+                            }
+                        }
+                    },
+                    "level": 1,
+                    "parent": "7_no"
                 }
             ]
         }

@@ -957,6 +957,11 @@ chownr@^2.0.0:
   resolved "https://registry.yarnpkg.com/chownr/-/chownr-2.0.0.tgz#15bfbe53d2eab4cf70f18a8cd68ebe5b3cb1dece"
   integrity sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==
 
+class-autoloader@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/class-autoloader/-/class-autoloader-1.0.3.tgz#1ed53dc9515194915b58697c2a475d0d17efe630"
+  integrity sha512-7AtybZLOJcQQPu5lb4xIng1nGaSc3xLl7H4ddv2IqbHje/XYZ/106Mjd/6NDO4Fr6JARfVAWexuSt66e3GlF/A==
+
 classcat@^5.0.3:
   version "5.0.3"
   resolved "https://registry.yarnpkg.com/classcat/-/classcat-5.0.3.tgz#38eaa0ec6eb1b10faf101bbcef2afb319c23c17b"

@@ -16,6 +16,11 @@ import BaseActionConfig from "./action-configs/base-action-config"
 import { BaseOperationSchema, OperationType } from "@/entities/BaseOperationSchema"
 import DeclarationActionConfig from "./action-configs/declaration-action-config"
 import { DeclarationOperationSchema } from "@/entities/DeclarationOperationSchema"
+import InputActionConfig from "./action-configs/input-action-config"
+import OutputActionConfig from "./action-configs/output-action-config"
+import AssignmentActionConfig from "./action-configs/asignment-action-config"
+import ConditionActionConfig from "./action-configs/condition-action-config"
+import LoopActionConfig from "./action-configs/loop-action-config"
 const program = require("@/data/program") as ProgramSchema;
 
 export interface IProgram{
@@ -29,10 +34,9 @@ export default function ProgramDiagram() {
     const [dlgSelAction, setDlgSelAction] = useState(false);
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
-    const [selectedOperation, setSelectedOperation] = useState<BaseOperationSchema|null>(null);
+    const [selectedOperation, setSelectedOperation] = useState<BaseOperationSchema|null|undefined>(null);
 
     const editNode = (id: string) => {
-        console.log(id)
         setSelectedOperation(handler.getOperation(id))
     }
 
@@ -71,9 +75,16 @@ export default function ProgramDiagram() {
                 </ReactFlow>}
             </section>
             <ActionSelector show={dlgSelAction} onDismiss={()=>{setDlgSelAction(false)}}></ActionSelector>
-            <BaseActionConfig show={selectedOperation!=null} onDismiss={()=>setSelectedOperation(null)}>
-                {selectedOperation?.type == OperationType.Declaration && <DeclarationActionConfig operation={selectedOperation as DeclarationOperationSchema}></DeclarationActionConfig>}
-            </BaseActionConfig>
+            {selectedOperation && 
+                <BaseActionConfig operation={selectedOperation} onDismiss={()=>setSelectedOperation(null)}>
+                    {selectedOperation?.type == OperationType.Declaration && <DeclarationActionConfig></DeclarationActionConfig>}
+                    {selectedOperation?.type == OperationType.Input && <InputActionConfig></InputActionConfig>}
+                    {selectedOperation?.type == OperationType.Output && <OutputActionConfig></OutputActionConfig>}
+                    {selectedOperation?.type == OperationType.Assignment && <AssignmentActionConfig></AssignmentActionConfig>}
+                    {selectedOperation?.type == OperationType.Condition && <ConditionActionConfig></ConditionActionConfig>}
+                    {selectedOperation?.type == OperationType.Loop && <LoopActionConfig></LoopActionConfig>}
+                </BaseActionConfig>
+            }
         </div>
     );
 }
