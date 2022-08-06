@@ -43,19 +43,6 @@ const findOperation = (id: string, scope:BaseOperationSchema[]) => {
     for(const operation of scope) {
         if(String(operation.id) === id) {
             return operation
-        } else if(operation.type == OperationType.Loop) {
-            const found = findOperation(id, (operation as LoopOperationSchema).operations)
-            if(found) {
-                return found
-            }
-        } else if(operation.type == OperationType.Condition) {
-            let found = findOperation(id, (operation as ConditionOperationSchema).yes)
-            if(!found) {
-                found = findOperation(id, (operation as ConditionOperationSchema).no)
-                if(found){
-                    return found
-                }
-            }
         }
     }
 
