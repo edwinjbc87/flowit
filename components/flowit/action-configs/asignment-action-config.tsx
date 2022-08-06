@@ -43,7 +43,7 @@ export default function AssignmentActionConfig(props: AssignmentActionConfigProp
         </div>
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">{intl.formatMessage({id: "config.expression"})}</label>
-            <ExpressionInput title={intl.formatMessage({id: "config.expression"})} expression={operation.expression} onChange={(exp)=>{setOperation({...operation, expression: exp})}}></ExpressionInput>
+            <ExpressionInput valueType={ValueType.Any} title={intl.formatMessage({id: "config.expression"})} expression={operation.expression} onChange={(exp)=>{updateOperation({...operation, expression: exp})}}></ExpressionInput>
         </div>
     </>)
 }

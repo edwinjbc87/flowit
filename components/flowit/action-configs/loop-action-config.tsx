@@ -37,7 +37,7 @@ export default function LoopActionConfig(props: LoopActionConfigProps) {
     <>
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">{intl.formatMessage({id: "config.condition"})}</label>
-            <ExpressionInput title={intl.formatMessage({id: "config.condition"})} expression={operation.condition} onChange={(exp)=>{setOperation({...operation, condition: exp})}}></ExpressionInput>
+            <ExpressionInput title={intl.formatMessage({id: "config.condition"})} valueType={ValueType.Boolean} expression={operation.condition} onChange={(exp)=>{updateOperation({...operation, condition: exp})}}></ExpressionInput>
         </div>
     </>)
 }

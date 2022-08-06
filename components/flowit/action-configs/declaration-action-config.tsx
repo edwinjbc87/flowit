@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { BaseOperationSchema } from "@/entities/BaseOperationSchema"
 import {ValueType} from "@/entities/ExpressionSchema"
 import ExpressionInput from "./expression-input"
+import { EditableExpressionSchema } from "@/entities/EditableExpressionSchema"
 
 interface DeclarationActionConfigProps {
     operation?: BaseOperationSchema;
@@ -16,21 +17,32 @@ export default function DeclarationActionConfig(props: DeclarationActionConfigPr
     const intl = useIntl();
     const {handler} = useProgram();
     const [operation, setOperation] = useState<DeclarationOperationSchema>({...props.operation} as DeclarationOperationSchema);
-
+    const [expression, setExpression] = useState<ExpressionSchema|any>();
+    
     const updateOperation = async (operation)=>{
         if(props.onChange){
             props.onChange(operation)
         }
     }
 
-    const getExpressionValue = (expression: ExpressionSchema):string=>{
-        return expression.left+''
+    const loadOperation = async (_operation: BaseOperationSchema)=>{
+        if(_operation){
+            setOperation(props.operation as DeclarationOperationSchema)
+        }
+    } 
+
+    const updateExpression = async (_expression:ExpressionSchema|any)=>{
+        const _var =(props.operation as DeclarationOperationSchema).variable;
+        if(handler.isExpression(_expression)){
+            setExpression({..._expression} as ExpressionSchema)
+        } else {
+            setExpression(_expression)
+        }
+        updateOperation({...operation, variable: {...operation.variable, value: _expression}})
     }
 
     useEffect(() => {
-        if(props.operation){
-            setOperation(props.operation as DeclarationOperationSchema)
-        }
+        if(props.operation) loadOperation(props.operation).catch(err=>console.error(err))
     }, [props.operation])
 
     return (
@@ -47,7 +59,7 @@ export default function DeclarationActionConfig(props: DeclarationActionConfigPr
         </div>
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">{intl.formatMessage({id: "config.expression"})}</label>
-            <ExpressionInput title={intl.formatMessage({id: "config.expression"})} expression={operation.variable.value} onChange={(exp)=>{setOperation({...operation, variable: {...operation.variable, value: exp}})}}></ExpressionInput>
+            <ExpressionInput expression={operation.variable.value} valueType={operation.variable.type} title={intl.formatMessage({id: "config.expression"})} onChange={updateExpression} />
         </div>
     </>)
 }

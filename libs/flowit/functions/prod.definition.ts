@@ -2,20 +2,20 @@ import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema";
 import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDefinition";
 import IOperationFunction from "../IOperationFunction";
 
-class Addition implements IOperationFunction {
+class Product implements IOperationFunction {
     definition:OperationDefinition = {
-        name: "sum",
+        name: "prod",
         returnType: ValueType.Number,
         unlimitedParameters: {name: "op", type: ValueType.Number} as ParameterDefinition,
-        description: "Adds two numbers"
+        description: "Multiply many numbers"
     };
     async calculate(params: ExpressionSchema[], evaluateExpression: (exp: ExpressionSchema) => Promise<any>): Promise<any> {
-        let acc = 0;
+        let acc = 1;
         for(let i=0; i<params.length; i++) {
-            acc += (await evaluateExpression(params[i])) as number;
+            acc *= (await evaluateExpression(params[i])) as number;
         }
         return acc;
     }
 }
 
-export default new Addition();
+export default new Product();

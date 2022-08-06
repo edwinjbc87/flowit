@@ -27,10 +27,7 @@ module.exports = {
                     "variable": {
                         "type": "integer",
                         "name": "a",
-                        "value": {
-                            "operation": "value",
-                            "left": 0
-                        }
+                        "value": 0
                     },
                     "level": 0
                 },
@@ -42,10 +39,7 @@ module.exports = {
                     "variable": {
                         "type": "integer",
                         "name": "b",
-                        "value": {
-                            "operation": "value",
-                            "left": 0
-                        }
+                        "value": 0
                     },
                     "level": 0
                 },
@@ -74,21 +68,22 @@ module.exports = {
                     "type": "output",
                     "expression": {
                         "operation": "concat",
-                        "left": {
-                            "operation": "value",
-                            "left": "Suma: "
-                        },
-                        "right": {
-                            "operation": "sum",
-                            "left": {
-                                "operation": "variable",
-                                "left": "a"
-                            },
-                            "right": {
-                                "operation": "variable",
-                                "left": "b"
+                        "params": [
+                            "Suma:",
+                            {
+                                "operation": "sum",
+                                "params": [
+                                    {
+                                        "operation": "var",
+                                        "params": ["a"]
+                                    },
+                                    {
+                                        "operation": "var",
+                                        "params": ["b"]
+                                    }
+                                ]
                             }
-                        }
+                        ]
                     },
                     "level": 0
                 },
@@ -99,21 +94,21 @@ module.exports = {
                     "type": "condition",
                     "condition": {
                         "operation": "gt",
-                        "left": {
-                            "operation": "sum",
-                            "left": {
-                                "operation": "variable",
-                                "left": "a"
-                            },
-                            "right": {
-                                "operation": "variable",
-                                "left": "b"
-                            }
-                        },
-                        "right": {
-                            "operation": "value",
-                            "left": 10
-                        }
+                        "params": [
+                            {
+                                "operation": "sum",
+                                "params": [
+                                    {
+                                        "operation": "var",
+                                        "params": ["a"]
+                                    },
+                                    {
+                                        "operation": "var",
+                                        "params": ["b"]
+                                    }
+                                ]
+                            }, 10
+                        ]
                     },
                     "level": 0,
                 },
@@ -124,21 +119,21 @@ module.exports = {
                     "type": "output",
                     "expression": {
                         "operation": "concat",
-                        "left": {
-                            "operation": "value",
-                            "left": "Si es mayor a 10: "
-                        },
-                        "right": {
-                            "operation": "sum",
-                            "left": {
-                                "operation": "variable",
-                                "left": "a"
-                            },
-                            "right": {
-                                "operation": "variable",
-                                "left": "b"
+                        "params": ["Si es mayor a 10: ",
+                            {
+                                "operation": "sum",
+                                "params": [
+                                    {
+                                        "operation": "var",
+                                        "params": ["a"]
+                                    },
+                                    {
+                                        "operation": "var",
+                                        "params": ["b"]
+                                    }
+                                ]
                             }
-                        }
+                        ]
                     },
                     "level": 1,
                     "parent": "7_yes"
@@ -150,21 +145,21 @@ module.exports = {
                     "type": "output",
                     "expression": {
                         "operation": "concat",
-                        "left": {
-                            "operation": "value",
-                            "left": "Es menor o igual a 10: "
-                        },
-                        "right": {
-                            "operation": "sum",
-                            "left": {
-                                "operation": "variable",
-                                "left": "a"
-                            },
-                            "right": {
-                                "operation": "variable",
-                                "left": "b"
+                        "params": ["Es menor o igual a 10: ",
+                            {
+                                "operation": "sum",
+                                "params": [
+                                    {
+                                        "operation": "var",
+                                        "params": ["a"]
+                                    },
+                                    {
+                                        "operation": "var",
+                                        "params": ["b"]
+                                    }
+                                ]
                             }
-                        }
+                        ]
                     },
                     "level": 1,
                     "parent": "7_no"

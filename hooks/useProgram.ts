@@ -15,6 +15,8 @@ import { InputOperationSchema } from "@/entities/InputOperationSchema"
 import { ConditionOperationSchema } from "@/entities/ConditionOperationSchema"
 import { LoopOperationSchema } from "@/entities/LoopOperationSchema"
 import { useProgramParser } from "hooks/useProgramParser"
+import IOperationFunction from "@/libs/flowit/IOperationFunction"
+import { Functions } from "@/libs/flowit/Functions"
 
 export default function useProgram() {
     const dispatch = useAppDispatch()
@@ -35,7 +37,7 @@ export default function useProgram() {
     const _setCurrentModule = async (name: string) => await dispatch(setCurrentModule(name))
     const getCurrentModule = () => project.modules[currentModuleIndex]
     
-    const variables = useRef(new Map())
+    const variables = useRef(new Map<string, any>())
 
     const renameOperation = async (id: string, name: string) => {
         await dispatch(setOperationName({id, name}));
@@ -81,15 +83,7 @@ export default function useProgram() {
         if(iniParamsIndex >= 0 && endParamsIndex >= 0) {
             parsedExp.operation = expressionString.substring(0, iniParamsIndex)
             console.log("Params", expressionString.substring(iniParamsIndex+1, endParamsIndex))
-            const params = await parseParams(expressionString.substring(iniParamsIndex+1, endParamsIndex))
-            if(params.length > 0) {
-                parsedExp.left = params[0]
-                if(params.length > 1) {
-                    parsedExp.right = params[1]
-                }
-            } else {
-                throw new Error("Invalid expression");
-            }
+            parsedExp.params = await parseParams(expressionString.substring(iniParamsIndex+1, endParamsIndex))
         } else {
             try{
                 console.log(`Parsing simple expression: ${expressionString}`)
@@ -106,119 +100,28 @@ export default function useProgram() {
         return Promise.all(paramsString.split(",").map((paramString) => parseExpression(paramString.trim())))
     }
 
-    const stringifyExpression = async (expression: ExpressionSchema):Promise<string> => {
-        if(expression.operation) {
-            if(expression.left || expression.left === 0) {
-                let str = expression.operation + "(" + await stringifyExpression(expression.left)
-                if(expression.right) {
-                    str += "," + await stringifyExpression(expression.right)
-                }
-                return str + ")";
-            }
-            return expression.operation;
-        } else {
-            return JSON.stringify(expression)
-        }
+    function isExpression(expression: any): expression is ExpressionSchema {
+        return expression.operation != undefined && expression.params != undefined
     }
 
-    const evaluateExpression = async (expression: ExpressionSchema) => {
+    const evaluateExpression = async (expression: ExpressionSchema|any) => {
         let val:any = null
-        switch (expression.operation) {
-            case "sum": {
-                const left = await evaluateExpression(expression.left)
-                const right = await evaluateExpression(expression.right)
-                val = left + right
-                break
-            }
-            case "sub": {
-                const left = await evaluateExpression(expression.left)
-                const right = await evaluateExpression(expression.right)
-                val = left - right
-                break
-            }
-            case "mul": {
-                const left = await evaluateExpression(expression.left)
-                const right = await evaluateExpression(expression.right)
-                val = left * right
-                break
-            }
-            case "div": {
-                const left = await evaluateExpression(expression.left)
-                const right = await evaluateExpression(expression.right)
-                val = left / right
-                break
-            }
-            case "and": {
-                const left = await evaluateExpression(expression.left)
-                const right = await evaluateExpression(expression.right)
-                val = left && right
-                break
-            }
-            case "or": {
-                const left = await evaluateExpression(expression.left)
-                const right = await evaluateExpression(expression.right)
-                val = left || right
-                break
-            }
-            case "not": {
-                const left = await evaluateExpression(expression.left)
-                val = !left
-                break
-            }
-            case "eq": {
-                const left = await evaluateExpression(expression.left)
-                const right = await evaluateExpression(expression.right)
-                val = (left === right)
-                break
-            }
-            case "neq": {
-                const left = await evaluateExpression(expression.left)
-                const right = await evaluateExpression(expression.right)
-                val = (left !== right)
-                break
-            }
-            case "lt": {
-                const left = await evaluateExpression(expression.left)
-                const right = await evaluateExpression(expression.right)
-                val = (left < right)
-                break
-            }
-            case "gt": {
-                const left = await evaluateExpression(expression.left)
-                const right = await evaluateExpression(expression.right)
 
-                val = (left > right)
-                break
-            }
-            case "le": {
-                const left = await evaluateExpression(expression.left)
-                const right = await evaluateExpression(expression.right)
-                val = (left <= right)
-                break
-            }
-            case "ge": {
-                const left = await evaluateExpression(expression.left)
-                const right = await evaluateExpression(expression.right)
-                val = (left >= right)
-                break
-            }
-            case "concat": {
-                const left = await evaluateExpression(expression.left)
-                const right = await evaluateExpression(expression.right)
-                val = `${left}${right}`
-                break
-            }
-            case "variable": {
-                val = variables.current.get(expression.left)
-                
-                break
-            }
-            default: {
-                val = expression.left
-                break
-            }
+        if(isExpression(expression)) {
+            const operator:IOperationFunction = (await import(`@/libs/flowit/functions/${expression.operation}.definition.ts`)).default as IOperationFunction
+            console.log("Operator", operator)
+            val = operator.calculate(expression.params, evaluateExpression, variables.current)
+        } else {
+            val = expression
         }
+
         return val
+    }
+
+    const getExpressionDefinition = async (operation: Functions) => {
+        const operator:IOperationFunction = (await import(`@/libs/flowit/functions/${operation}.definition.ts`)).default as IOperationFunction
+        return operator.definition
+        
     }
 
     const runProgram = async () => {
@@ -300,7 +203,7 @@ export default function useProgram() {
                     let variableName = String((operation as InputOperationSchema).variable)
                     let val:any = await prompt(msg)
 
-                    variables.current.set(variableName, await getValue(variableName, {operation: "value", left: val}))
+                    variables.current.set(variableName, await getValue(variableName, val))
                     
                     await dispatch(setExecutionVariable({ name: variableName, value: variables.current.get(variableName) }))
                     break
@@ -333,5 +236,5 @@ export default function useProgram() {
         }
     }
 
-    return {program, project, diagram, currentModuleIndex, execution, handler: {setDiagram: _setDiagram, setProject: _setProject, setCurrentModule: _setCurrentModule, setProgram: _setProgram, getCurrentModule, runProgram, renameOperation, updateOperation: findAndUpdateOperation, saveOperation, getOperation: findOperation, stringifyExpression, parseExpression}}
+    return {program, project, diagram, currentModuleIndex, execution, handler: {setDiagram: _setDiagram, setProject: _setProject, setCurrentModule: _setCurrentModule, setProgram: _setProgram, getCurrentModule, runProgram, renameOperation, updateOperation: findAndUpdateOperation, saveOperation, getOperation: findOperation, parseExpression, isExpression, getExpressionDefinition}}
 }

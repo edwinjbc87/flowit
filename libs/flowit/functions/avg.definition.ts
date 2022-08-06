@@ -2,20 +2,23 @@ import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema";
 import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDefinition";
 import IOperationFunction from "../IOperationFunction";
 
-class Addition implements IOperationFunction {
+class Average implements IOperationFunction {
     definition:OperationDefinition = {
-        name: "sum",
+        name: "avg",
         returnType: ValueType.Number,
         unlimitedParameters: {name: "op", type: ValueType.Number} as ParameterDefinition,
-        description: "Adds two numbers"
+        description: "Average of many numbers"
     };
     async calculate(params: ExpressionSchema[], evaluateExpression: (exp: ExpressionSchema) => Promise<any>): Promise<any> {
-        let acc = 0;
-        for(let i=0; i<params.length; i++) {
-            acc += (await evaluateExpression(params[i])) as number;
+        if(params.length <= 0) {
+            return 0
         }
-        return acc;
+        let acc = 0
+        for(let i=0; i<params.length; i++) {
+            acc += (await evaluateExpression(params[i])) as number
+        }
+        return acc / params.length;
     }
 }
 
-export default new Addition();
+export default new Average();
