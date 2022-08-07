@@ -30,14 +30,6 @@ export default function BaseActionConfig(props: BaseActionConfigProps) {
     }
 
     const saveOperation = async ()=>{
-        // if(operation){
-        //     if(props.isNew){
-        //         await handler.addOperation(operation);
-        //     } else {
-        //         await handler.saveOperation(operation);
-        //     }
-        // }
-        // onDismiss();
         await props.onSave(operation);
     }
 

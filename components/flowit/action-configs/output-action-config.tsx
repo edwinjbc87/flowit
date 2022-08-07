@@ -2,7 +2,7 @@ import { DeclarationOperationSchema } from "@/entities/DeclarationOperationSchem
 import { useIntl } from "react-intl"
 import useProgram from "@/hooks/useProgram"
 import { ExpressionSchema } from "@/entities/ExpressionSchema"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { BaseOperationSchema } from "@/entities/BaseOperationSchema"
 import {ValueType} from "@/entities/ExpressionSchema"
 import ExpressionInput from "./expression-input"
@@ -17,8 +17,11 @@ export default function OutputActionConfig(props: OutputActionConfigProps) {
     const intl = useIntl();
     const {handler} = useProgram();
     const [operation, setOperation] = useState<OutputOperationSchema>({...props.operation} as OutputOperationSchema);
+    const [expression, setExpression] = useState<ExpressionSchema|any>();
+    const expBuilder = useRef<any>();
 
     const updateOperation = async (operation)=>{
+        const _exp = expBuilder.current?.getExpression();
         if(props.onChange){
             props.onChange(operation)
         }
@@ -34,7 +37,7 @@ export default function OutputActionConfig(props: OutputActionConfigProps) {
     <>
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">{intl.formatMessage({id: "config.expression"})}</label>
-            <ExpressionInput title={intl.formatMessage({id: "config.expression"})} valueType={ValueType.String} expression={operation.expression} onChange={(exp)=>{updateOperation({...operation, expression: exp})}}></ExpressionInput>
+            <ExpressionInput ref={expBuilder} title={intl.formatMessage({id: "config.expression"})} valueType={ValueType.String} expression={operation.expression} onChange={(exp)=>{updateOperation({...operation, expression: exp})}}></ExpressionInput>
         </div>
     </>)
 }

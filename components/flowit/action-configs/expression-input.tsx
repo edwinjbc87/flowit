@@ -1,23 +1,39 @@
 import { ExpressionSchema, ExpressionValue, ValueType } from "@/entities/ExpressionSchema";
 import useProgram from "@/hooks/useProgram";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { Functions } from "@/libs/flowit/Functions";
 import { useIntl } from "react-intl";
 import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDefinition";
 import styles from "@/styles/expression-input.module.css";
 import debounce from "lodash.debounce";
 
-export default function ExpressionInput({expression, title, valueType, onChange}:{expression:ExpressionSchema|any, title?: string, valueType:ValueType, onChange:(expression:ExpressionSchema|ExpressionValue)=>void}) {
+const ExpressionInput = forwardRef(function ExpressionInputBase({expression, title, valueType, onChange}:{expression:ExpressionSchema|any, title?: string, valueType:ValueType, onChange:(expression:ExpressionSchema|ExpressionValue)=>void}, ref){
     const {handler, currentModuleIndex, program} = useProgram();
+    const [exp, setExp] = useState(expression);
     const [expDefinition, setExpDefinition] = useState<OperationDefinition|null>({} as OperationDefinition);
     const [parameters, setParameters] = useState<(ExpressionSchema|ExpressionValue)[]>([]);
+    const paramsRefs = useRef<any[]>([]);
     const intl = useIntl();
+
+    useImperativeHandle(ref, () => ({
+        getExpression: () => {
+            if(handler.isExpression(exp)){
+                const _params = paramsRefs.current.map(_ref => _ref.current.getExpression())
+                console.log("Child Params:", _params)
+                return {...exp, params: _params};
+            } else {
+                return exp;
+            }
+        },
+    }));
     
     const updateExpression = async (newValue:ExpressionSchema|any)=>{
         try{
             if(handler.isExpression(newValue)){
+                setExp(newValue)
                 onChange(newValue)
             } else {
+                setExp(castValueFromString(newValue, valueType??ValueType.String))
                 onChange(castValueFromString(newValue, valueType??ValueType.String))
             }
         }catch(err){
@@ -114,22 +130,27 @@ export default function ExpressionInput({expression, title, valueType, onChange}
     }
 
     const loadDefinition = async ()=>{
+        setExp(expression)
         setParameters(expression?.params)
         setExpDefinition(handler.isExpression(expression)? await handler.getExpressionDefinition(expression.operation as Functions) : null)
     }
 
+    // useEffect(() => {
+    //     loadDefinition().catch(err=>console.error("Error loading expression definition", err))
+    // }, [expression])
+
     useEffect(() => {
         loadDefinition().catch(err=>console.error("Error loading expression definition", err))
-    }, [expression])
+    }, [])
 
     const showParametersBox = ()=>{
         if(expDefinition){
             if(expDefinition.parameters){
-                return (<div>{parameters && (parameters as (ExpressionSchema|any)[]).map((p, idx)=>(<ExpressionInput valueType={p.type?p.type:ValueType.Any} key={`param-${idx}`} expression={p} title={((expDefinition.parameters?expDefinition.parameters[idx]:{}) as ParameterDefinition).name} onChange={(ev)=>updateParamExpression(ev, idx)} />))}</div>)
+                return (<div>{parameters && (parameters as (ExpressionSchema|any)[]).map((p, idx)=>(<ExpressionInput ref={paramsRefs.current[idx]} valueType={p.type?p.type:ValueType.Any} key={`param-${idx}`} expression={p} title={((expDefinition.parameters?expDefinition.parameters[idx]:{}) as ParameterDefinition).name} onChange={(ev)=>updateParamExpression(ev, idx)} />))}</div>)
             } else if(expDefinition.unlimitedParameters){
                 return (
                 <div>
-                    {parameters && (parameters as (ExpressionSchema|any)[]).map((p, idx)=>(<ExpressionInput valueType={expDefinition.unlimitedParameters?.type??ValueType.Any}  key={`param-${idx}`} expression={p} title={String(expDefinition.unlimitedParameters?.name)} onChange={(ev)=>updateParamExpression(ev, idx)} />))}
+                    {parameters && (parameters as (ExpressionSchema|any)[]).map((p, idx)=>(<ExpressionInput ref={paramsRefs.current[idx]} valueType={expDefinition.unlimitedParameters?.type??ValueType.Any}  key={`param-${idx}`} expression={p} title={String(expDefinition.unlimitedParameters?.name)} onChange={(ev)=>updateParamExpression(ev, idx)} />))}
                     <button className="btn btn-primary" onClick={addParam}>{intl.formatMessage({id: "config.addParam"})}</button>
                 </div>)
             }
@@ -139,7 +160,7 @@ export default function ExpressionInput({expression, title, valueType, onChange}
     }
 
     const changeOperation = async (operation:Functions)=>{
-        let newExp = handler.isExpression(expression)? {...expression} : expression;
+        let newExp = handler.isExpression(exp)? {...exp} : exp;
         if(operation && operation !== Functions.Value){
             const def = await handler.getExpressionDefinition(operation)
             console.log(def)
@@ -150,6 +171,7 @@ export default function ExpressionInput({expression, title, valueType, onChange}
                     _params.push(...parameters)
                     for(let i=_params.length-1; i>=def.parameters.length; i++){
                         _params.pop()
+                        paramsRefs.current.pop()
                     }
                 } else {
                     for(let i=0; i<def.parameters.length; i++){
@@ -174,7 +196,7 @@ export default function ExpressionInput({expression, title, valueType, onChange}
         }
     }
 
-    const debouncedUpdateExpression = useMemo(()=>debounce(updateExpression, 500), [])
+    //const debouncedUpdateExpression = useMemo(()=>debounce(updateExpression, 500), [])
 
     return (
         <div className={styles["expression-input"]}>
@@ -182,11 +204,13 @@ export default function ExpressionInput({expression, title, valueType, onChange}
                 <select title={intl.formatMessage({id: "operations."+(handler.isExpression(expression)?expression.operation:Functions.Value)})} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={handler.isExpression(expression)?expression.operation:Functions.Value} onChange={(ev)=>{changeOperation(ev.currentTarget.value as Functions)}}>
                     {Object.values(Functions).map((f, idx)=>(<option key={`func-${f}`} value={f}>{intl.formatMessage({id: "operations."+f})}</option>))}
                 </select>
-                {!expression?.operation && <input type="text" title={intl.formatMessage({id: "operations.value"})} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={expression} onChange={(ev)=>debouncedUpdateExpression(ev.currentTarget.value)} />}
+                {!expression?.operation && <input type="text" title={intl.formatMessage({id: "operations.value"})} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={exp} onChange={(ev)=>updateExpression(ev.currentTarget.value)} />}
             </div>
             <div className={styles["expression-input__params"]}>
                 {showParametersBox()}
             </div>
         </div>
     )
-}
+})
+
+export default ExpressionInput
