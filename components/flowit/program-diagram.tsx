@@ -14,6 +14,7 @@ import { ProgramSchema } from "@/entities/ProgramSchema"
 import { Node, Edge } from 'react-flow-renderer'
 import BaseActionConfig from "./action-configs/base-action-config"
 import { BaseOperationSchema, OperationType } from "@/entities/BaseOperationSchema"
+import { NodeType } from "@/entities/Node"
 
 export interface IProgram{
     diagram: Diagram;
@@ -26,10 +27,33 @@ export default function ProgramDiagram() {
     const [dlgSelAction, setDlgSelAction] = useState(false);
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
+    const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null);
     const [selectedOperation, setSelectedOperation] = useState<BaseOperationSchema|null|undefined>(null);
 
     const editNode = (id: string) => {
         setSelectedOperation(handler.getOperation(id))
+    }
+
+    const addNode = async (operation: NodeType) => {
+        const op = await handler.getDefaultOperation(String(operation) as OperationType);
+        setSelectedOperation(op)
+    }
+
+    const onClickEdge = (edge: Edge) => {
+        setSelectedEdge(edge)
+        setDlgSelAction(true)
+    }
+
+    const saveOperation = async (operation: BaseOperationSchema) => {
+        if(selectedEdge != null){
+            await handler.addOperation(operation, selectedEdge.source)
+        } else {
+            await handler.saveOperation(operation)
+        }
+        
+        setSelectedOperation(null)
+        setDlgSelAction(false)
+        setSelectedEdge(null)
     }
 
     useEffect(() => {
@@ -61,14 +85,14 @@ export default function ProgramDiagram() {
         <div>
             <FilesNavigation></FilesNavigation>
             <section className={styles.diagram} id="diagram">
-                {diagram && diagram.nodes.length > 0 && <ReactFlow defaultNodes={nodes} edges={edges} nodesDraggable={true} onEdgeClick={()=>setDlgSelAction(true)} onNodeClick={(ev, n)=>editNode(n.id)}>
+                {diagram && diagram.nodes.length > 0 && <ReactFlow defaultNodes={nodes} edges={edges} nodesDraggable={true} onEdgeClick={(ev, edge)=>onClickEdge(edge)} onNodeClick={(ev, n)=>editNode(n.id)}>
                     <Background />
                     <Controls />
                 </ReactFlow>}
             </section>
-            <ActionSelector show={dlgSelAction} onDismiss={()=>{setDlgSelAction(false)}}></ActionSelector>
+            {dlgSelAction && <ActionSelector onSelectedOperation={addNode} onDismiss={()=>{setDlgSelAction(false)}}></ActionSelector>}
             {selectedOperation && 
-                <BaseActionConfig operation={selectedOperation} onDismiss={()=>setSelectedOperation(null)}>
+                <BaseActionConfig onSave={saveOperation} operation={selectedOperation} onDismiss={()=>setSelectedOperation(null)}>
                 </BaseActionConfig>
             }
         </div>

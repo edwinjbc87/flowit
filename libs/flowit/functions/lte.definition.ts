@@ -6,7 +6,10 @@ class Leq implements IOperationFunction {
     definition:OperationDefinition = {
         name: "lte",
         returnType: ValueType.Boolean,
-        unlimitedParameters: {name: "op", type: ValueType.Number} as ParameterDefinition,
+        parameters: [
+            {name: "op1", type: ValueType.Number},
+            {name: "op2", type: ValueType.Number}
+        ],
         description: "Return true if the first parameter is less than or equal to the second"
     }
     

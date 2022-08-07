@@ -11,12 +11,12 @@ import OutputActionConfig from "./output-action-config";
 import AssignmentActionConfig from "./asignment-action-config";
 import ConditionActionConfig from "./condition-action-config";
 import LoopActionConfig from "./loop-action-config";
-import { EditableExpressionSchema } from "@/entities/EditableExpressionSchema";
 
 interface BaseActionConfigProps {
     operation: BaseOperationSchema,
     children: React.ReactNode,
-    onDismiss: () => void
+    onDismiss: () => void,
+    onSave: (operation: BaseOperationSchema) => void,
 }
 
 export default function BaseActionConfig(props: BaseActionConfigProps) {
@@ -25,16 +25,20 @@ export default function BaseActionConfig(props: BaseActionConfigProps) {
     const {program, handler} = useProgram();
     const [operation, setOperation] = useState<BaseOperationSchema>({...props.operation});
 
-    const updateOperation = async (operation)=>{
-        console.log("updateOperation", operation);
+    const updateOperation = (operation)=>{
         setOperation(operation);
     }
 
     const saveOperation = async ()=>{
-        if(operation){
-            await handler.saveOperation(operation);
-        }
-        onDismiss();
+        // if(operation){
+        //     if(props.isNew){
+        //         await handler.addOperation(operation);
+        //     } else {
+        //         await handler.saveOperation(operation);
+        //     }
+        // }
+        // onDismiss();
+        await props.onSave(operation);
     }
 
     return (

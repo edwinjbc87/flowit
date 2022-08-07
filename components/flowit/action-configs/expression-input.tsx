@@ -1,10 +1,11 @@
 import { ExpressionSchema, ExpressionValue, ValueType } from "@/entities/ExpressionSchema";
 import useProgram from "@/hooks/useProgram";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Functions } from "@/libs/flowit/Functions";
 import { useIntl } from "react-intl";
 import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDefinition";
 import styles from "@/styles/expression-input.module.css";
+import debounce from "lodash.debounce";
 
 export default function ExpressionInput({expression, title, valueType, onChange}:{expression:ExpressionSchema|any, title?: string, valueType:ValueType, onChange:(expression:ExpressionSchema|ExpressionValue)=>void}) {
     const {handler, currentModuleIndex, program} = useProgram();
@@ -102,10 +103,6 @@ export default function ExpressionInput({expression, title, valueType, onChange}
         }
     }
 
-    const getParam = (index:number)=>{
-        return (expression.params.length>index)? expression.params[index] : null
-    }
-
     const addParam = ()=>{
         const _params = [...expression.params] as (ExpressionSchema|any)[]
         const paramType = expDefinition?.unlimitedParameters?.type
@@ -177,13 +174,15 @@ export default function ExpressionInput({expression, title, valueType, onChange}
         }
     }
 
+    const debouncedUpdateExpression = useMemo(()=>debounce(updateExpression, 500), [])
+
     return (
         <div className={styles["expression-input"]}>
             <div className={`${styles["expression-input__selector"]} flex`}>
-                <select title={intl.formatMessage({id: "config.expression"})} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={expression?expression.operation:Functions.Value} onChange={(ev)=>{changeOperation(ev.currentTarget.value as Functions)}}>
+                <select title={intl.formatMessage({id: "operations."+(handler.isExpression(expression)?expression.operation:Functions.Value)})} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={handler.isExpression(expression)?expression.operation:Functions.Value} onChange={(ev)=>{changeOperation(ev.currentTarget.value as Functions)}}>
                     {Object.values(Functions).map((f, idx)=>(<option key={`func-${f}`} value={f}>{intl.formatMessage({id: "operations."+f})}</option>))}
                 </select>
-                {!expression?.operation && <input type="text" title={intl.formatMessage({id: "operations.value"})} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={expression} onChange={(ev)=>updateExpression(ev.currentTarget.value)} />}
+                {!expression?.operation && <input type="text" title={intl.formatMessage({id: "operations.value"})} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={expression} onChange={(ev)=>debouncedUpdateExpression(ev.currentTarget.value)} />}
             </div>
             <div className={styles["expression-input__params"]}>
                 {showParametersBox()}

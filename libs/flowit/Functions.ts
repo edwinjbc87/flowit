@@ -14,5 +14,9 @@ export enum Functions{
     And = "and",
     Or = "or",
     Value = "value",
-    Var = "var"
+    Var = "var",
+    Concat = "concat",
+    Max = "max",
+    Min = "min",
+    Length = "length",
 }

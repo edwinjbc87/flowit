@@ -6,7 +6,10 @@ class Geq implements IOperationFunction {
     definition:OperationDefinition = {
         name: "gte",
         returnType: ValueType.Boolean,
-        unlimitedParameters: {name: "op", type: ValueType.Number} as ParameterDefinition,
+        parameters: [
+            {name: "op1", type: ValueType.Number},
+            {name: "op2", type: ValueType.Number}
+        ],
         description: "Return true if the first parameter is greater than or equal to the second"
     }
     

@@ -8,6 +8,7 @@ import { ProgramSchema } from "@/entities/ProgramSchema"
 import { ModuleSchema } from "@/entities/ModuleSchema"
 import { BaseOperationSchema, OperationType } from "@/entities/BaseOperationSchema"
 import { DeclarationOperationSchema } from "@/entities/DeclarationOperationSchema"
+import { AssignmentOperationSchema } from "@/entities/AssignmentOperationSchema"
 import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema"
 import { useRef, useState } from "react"
 import { OutputOperationSchema } from "@/entities/OutputOperationSchema"
@@ -47,6 +48,23 @@ export default function useProgram() {
         await findAndUpdateOperation(String(operation.id), operation, program.modules[currentModuleIndex].operations)
     }
 
+    const addOperation = async (operation: BaseOperationSchema, previousId: String) => {
+        const _program = JSON.parse(JSON.stringify(program));
+        const prevOper = _program.modules[currentModuleIndex].operations.find(op => String(op.id) == String(previousId));
+        if(!prevOper) {
+            throw new Error("Previous operation not found")
+        }
+        const postOpers = _program.modules[currentModuleIndex].operations.filter(op => op.order > prevOper.order);
+        for(const op of postOpers) {
+            op.order += 1;
+        }
+        _program.modules[currentModuleIndex].operations.push({...operation, order: prevOper.order + 1});
+        const _project = await parseSchema(_program)
+
+        await dispatch(setProgram(_program))
+        await dispatch(setProject(_project))
+    }
+
     const findOperation = (id: string) => {
         return program.modules[currentModuleIndex].operations.find(op => String(op.id) == String(id))
     }
@@ -62,46 +80,8 @@ export default function useProgram() {
         }
     }
 
-    const parseExpression = async (expressionString: string):Promise<ExpressionSchema|any> => {
-        const parsedExp = {} as ExpressionSchema
-
-        let token = "";
-        for(let i=0; i<expressionString.length; i++) {
-            const char = expressionString[i]
-            if(char == " ") {
-                continue
-            } else {
-                token += char
-            }
-        }
-
-        const iniParamsIndex = expressionString.indexOf("(")
-        const endParamsIndex = expressionString.lastIndexOf(")")
-
-        console.log(`(:${iniParamsIndex},):${endParamsIndex}`)
-
-        if(iniParamsIndex >= 0 && endParamsIndex >= 0) {
-            parsedExp.operation = expressionString.substring(0, iniParamsIndex)
-            console.log("Params", expressionString.substring(iniParamsIndex+1, endParamsIndex))
-            parsedExp.params = await parseParams(expressionString.substring(iniParamsIndex+1, endParamsIndex))
-        } else {
-            try{
-                console.log(`Parsing simple expression: ${expressionString}`)
-                return JSON.parse(expressionString)
-            }catch{
-                throw new Error("Invalid expression");
-            }
-        }
-
-        return parsedExp
-    }
-
-    const parseParams = async (paramsString: string):Promise<ExpressionSchema[]> => {
-        return Promise.all(paramsString.split(",").map((paramString) => parseExpression(paramString.trim())))
-    }
-
     function isExpression(expression: any): expression is ExpressionSchema {
-        return expression.operation != undefined && expression.params != undefined
+        return expression != undefined && expression.operation != undefined && expression.params != undefined
     }
 
     const evaluateExpression = async (expression: ExpressionSchema|any) => {
@@ -165,9 +145,36 @@ export default function useProgram() {
         return val
     }
 
+    const getDefaultOperation = async (operation:OperationType):Promise<BaseOperationSchema> => {
+        const _program = JSON.parse(JSON.stringify(program));
+        const lastOp = (_program.modules[currentModuleIndex].operations.sort((a,b) => b.id - a.id) as BaseOperationSchema[])[0]
+
+        const newOperation = {id: lastOp.id + 1, name: "", type: operation}
+        switch(operation) {
+            case OperationType.Declaration: {
+                return {...newOperation, variable: {name: "", type: ValueType.String}} as DeclarationOperationSchema
+            }
+            case OperationType.Assignment: {
+                return {...newOperation, variable: "", expression: ""} as AssignmentOperationSchema
+            }
+            case OperationType.Condition: {
+                return {...newOperation, condition: true} as ConditionOperationSchema
+            }
+            case OperationType.Loop: {
+                return {...newOperation, condition: true} as LoopOperationSchema
+            }
+            case OperationType.Input: {
+                return {...newOperation, variable: ""} as InputOperationSchema
+            }
+            case OperationType.Output: {
+                return {...newOperation, expression: ""} as OutputOperationSchema
+            }
+        }
+        return newOperation as BaseOperationSchema
+    }
+
     const runScope = async (operations: BaseOperationSchema[], parentId?:string)=>{
-        const opers = operations.filter(op=> (!op.parent && !parent) || (op.parent == parentId))
-        console.log("Parent:", parentId, "Operations:", operations, "FilteredOpers:", opers)
+        const opers = JSON.parse(JSON.stringify(operations)).filter(op=> (!op.parent && !parent) || (op.parent == parentId)).sort((a,b) => a.order - b.order) as BaseOperationSchema[]
 
         for(let i = 0; i < opers.length; i++) {
             let operation = opers[i]
@@ -236,5 +243,5 @@ export default function useProgram() {
         }
     }
 
-    return {program, project, diagram, currentModuleIndex, execution, handler: {setDiagram: _setDiagram, setProject: _setProject, setCurrentModule: _setCurrentModule, setProgram: _setProgram, getCurrentModule, runProgram, renameOperation, updateOperation: findAndUpdateOperation, saveOperation, getOperation: findOperation, parseExpression, isExpression, getExpressionDefinition}}
+    return {program, project, diagram, currentModuleIndex, execution, handler: {setDiagram: _setDiagram, setProject: _setProject, setCurrentModule: _setCurrentModule, setProgram: _setProgram, getCurrentModule, runProgram, renameOperation, updateOperation: findAndUpdateOperation, saveOperation, getOperation: findOperation, isExpression, getExpressionDefinition, addOperation, getDefaultOperation}}
 }

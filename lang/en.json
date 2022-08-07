@@ -30,6 +30,7 @@
     "playground.running": "Running...",
     "playground.variable": "Variable",
     "playground.value": "Value",
+    "operations.var": "Var",
     "actions.yes": "Yes",
     "actions.no": "No",
     "actions.start": "Start",
@@ -54,5 +55,9 @@
     "operations.geq": "Greater or equal to",
     "operations.lt": "Lower than",
     "operations.leq": "Lower or equal to",
-    "operations.value": "Value"
+    "operations.value": "Value",
+    "operations.concat": "Concatenate",
+    "operations.length": "Length",
+    "operations.max": "Max",
+    "operations.min": "Min"
 }

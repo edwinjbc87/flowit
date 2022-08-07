@@ -3,5 +3,5 @@ import { ExpressionSchema } from "./ExpressionSchema";
 
 export interface AssignmentOperationSchema extends BaseOperationSchema {
     variable: string;
-    expression: ExpressionSchema;
+    expression: ExpressionSchema|any;
 }

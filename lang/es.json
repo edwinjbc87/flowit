@@ -40,6 +40,7 @@
     "actions.loop": "Bucle",
     "actions.assignment": "Asignación",
     "actions.declaration": "Declaración",
+    "operations.var": "Var",
     "operations.sum": "Suma",
     "operations.sub": "Resta",
     "operations.prod": "Multiplicación",
@@ -54,5 +55,9 @@
     "operations.gte": "Mayor o igual que",
     "operations.lt": "Menor que",
     "operations.lte": "Menor o igual que",
-    "operations.value": "Valor"
+    "operations.value": "Valor",
+    "operations.concat": "Concatenar",
+    "operations.length": "Longitud",
+    "operations.max": "Max",
+    "operations.min": "Min"
 }
