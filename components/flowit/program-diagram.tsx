@@ -35,7 +35,7 @@ export default function ProgramDiagram() {
     }
 
     const addNode = async (operation: NodeType) => {
-        const op = await handler.getDefaultOperation(String(operation) as OperationType);
+        const op = await handler.getDefaultOperation(String(operation) as OperationType, parseInt(selectedEdge?selectedEdge.target:"1"));
         setSelectedOperation(op)
     }
 

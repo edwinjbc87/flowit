@@ -2,7 +2,7 @@ import { DeclarationOperationSchema } from "@/entities/DeclarationOperationSchem
 import { useIntl } from "react-intl"
 import useProgram from "@/hooks/useProgram"
 import { ExpressionSchema } from "@/entities/ExpressionSchema"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { BaseOperationSchema, OperationType } from "@/entities/BaseOperationSchema"
 import {ValueType} from "@/entities/ExpressionSchema"
 import { AssignmentOperationSchema } from "@/entities/AssignmentOperationSchema"
@@ -10,6 +10,7 @@ import ExpressionInput from "./expression-input"
 
 interface AssignmentActionConfigProps {
     operation?: BaseOperationSchema;
+    variables?: string[];
     onChange?: (operation: BaseOperationSchema) => void;
 }
 
@@ -26,12 +27,14 @@ export default function AssignmentActionConfig(props: AssignmentActionConfigProp
     }
 
     useEffect(() => {
+        const _vars = program.modules[currentModuleIndex].operations.filter(o=>o.order < operation.order && o.type == OperationType.Declaration).map(o => (o as DeclarationOperationSchema).variable.name)
+        
+        setVariables(_vars);
         if(props.operation){
-            setOperation(props.operation as AssignmentOperationSchema)
+            setOperation({...props.operation, variable: _vars.length > 0 ? _vars[0] : ""} as AssignmentOperationSchema)
         }
-
-        setVariables(program.modules[currentModuleIndex].operations.filter(o=>o.order < operation.order && o.type == OperationType.Declaration).map(o => (o as DeclarationOperationSchema).variable.name));
     }, [props.operation])
+
 
     return (
     <>
@@ -43,7 +46,7 @@ export default function AssignmentActionConfig(props: AssignmentActionConfigProp
         </div>
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">{intl.formatMessage({id: "config.expression"})}</label>
-            <ExpressionInput valueType={ValueType.Any} title={intl.formatMessage({id: "config.expression"})} expression={operation.expression} onChange={(exp)=>{updateOperation({...operation, expression: exp})}}></ExpressionInput>
+            <ExpressionInput valueType={ValueType.Any} title={intl.formatMessage({id: "config.expression"})} expression={operation.expression} onChange={(_exp=>updateOperation({...operation, expression: _exp}))}></ExpressionInput>
         </div>
     </>)
 }

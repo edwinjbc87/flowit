@@ -14,10 +14,7 @@ interface DeclarationActionConfigProps {
 
 export default function DeclarationActionConfig(props: DeclarationActionConfigProps) {
     const intl = useIntl();
-    const {handler} = useProgram();
     const [operation, setOperation] = useState<DeclarationOperationSchema>({...props.operation} as DeclarationOperationSchema);
-    const [expression, setExpression] = useState<ExpressionSchema|any>();
-    const expBuilder = useRef<any>();
     
     const updateOperation = async (operation)=>{
         if(props.onChange){
@@ -30,19 +27,6 @@ export default function DeclarationActionConfig(props: DeclarationActionConfigPr
             setOperation(props.operation as DeclarationOperationSchema)
         }
     } 
-
-    const updateExpression = async (_expression:ExpressionSchema|any)=>{
-        const _var =(props.operation as DeclarationOperationSchema).variable;
-        const _exp = expBuilder.current?.getExpression();
-        console.log("Declaration:", _exp)
-
-        if(handler.isExpression(_expression)){
-            setExpression({..._expression} as ExpressionSchema)
-        } else {
-            setExpression(_expression)
-        }
-        updateOperation({...operation, variable: {...operation.variable, value: _expression}})
-    }
 
     useEffect(() => {
         if(props.operation) loadOperation(props.operation).catch(err=>console.error(err))
@@ -62,7 +46,7 @@ export default function DeclarationActionConfig(props: DeclarationActionConfigPr
         </div>
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">{intl.formatMessage({id: "config.expression"})}</label>
-            <ExpressionInput ref={expBuilder} expression={operation.variable.value} valueType={operation.variable.type} title={intl.formatMessage({id: "config.expression"})} onChange={updateExpression} />
+            <ExpressionInput onChange={(_exp)=>updateOperation({...operation, variable: {...operation.variable, value: _exp}})} expression={operation.variable.value} valueType={operation.variable.type} title={intl.formatMessage({id: "config.expression"})} />
         </div>
     </>)
 }

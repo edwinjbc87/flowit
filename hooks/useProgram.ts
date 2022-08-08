@@ -90,7 +90,30 @@ export default function useProgram() {
         if(isExpression(expression)) {
             const operator:IOperationFunction = (await import(`@/libs/flowit/functions/${expression.operation}.definition.ts`)).default as IOperationFunction
             console.log("Operator", operator)
-            val = operator.calculate(expression.params, evaluateExpression, variables.current)
+
+            val = await operator.calculate(expression.params, evaluateExpression, variables.current)
+            switch(operator.definition.returnType) {
+                case ValueType.Integer: {
+                    val = parseInt(val)
+                    break
+                }
+                case ValueType.Number: {
+                    val = parseFloat(val)
+                    break
+                }
+                case ValueType.String: {
+                    val = String(val)
+                    break
+                }
+                case ValueType.Boolean: {
+                    val = !!val
+                    break
+                }
+                case ValueType.Array: {
+                    val = JSON.parse(val)
+                    break
+                }
+            }
         } else {
             val = expression
         }
@@ -145,11 +168,11 @@ export default function useProgram() {
         return val
     }
 
-    const getDefaultOperation = async (operation:OperationType):Promise<BaseOperationSchema> => {
+    const getDefaultOperation = async (operation:OperationType, order?:number):Promise<BaseOperationSchema> => {
         const _program = JSON.parse(JSON.stringify(program));
         const lastOp = (_program.modules[currentModuleIndex].operations.sort((a,b) => b.id - a.id) as BaseOperationSchema[])[0]
 
-        const newOperation = {id: lastOp.id + 1, name: "", type: operation}
+        const newOperation = {id: lastOp.id + 1, name: "", type: operation, order}
         switch(operation) {
             case OperationType.Declaration: {
                 return {...newOperation, variable: {name: "", type: ValueType.String}} as DeclarationOperationSchema
@@ -188,7 +211,6 @@ export default function useProgram() {
                     break
                 }
                 case OperationType.Output: {
-                    
                     let val = String(await evaluateExpression((operation as OutputOperationSchema).expression))
                     
                     await dispatch(addExecutionOutput(val))
@@ -196,9 +218,8 @@ export default function useProgram() {
                 }
                 case OperationType.Assignment: {
                     
-                    let msg = String((operation as InputOperationSchema).message)
-                    let variableName = String((operation as InputOperationSchema).variable)
-                    let val:any = String(await evaluateExpression((operation as OutputOperationSchema).expression))
+                    let variableName = String((operation as AssignmentOperationSchema).variable)
+                    let val:any = String(await evaluateExpression((operation as AssignmentOperationSchema).expression))
 
                     variables.current.set(variableName, await getValue(variableName, val))
                     await dispatch(setExecutionVariable({ name: variableName, value: variables.current.get(variableName) }))

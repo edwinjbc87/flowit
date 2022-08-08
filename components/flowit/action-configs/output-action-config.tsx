@@ -26,7 +26,7 @@ export default function OutputActionConfig(props: OutputActionConfigProps) {
             props.onChange(operation)
         }
     }
-    
+
     useEffect(() => {
         if(props.operation){
             setOperation(props.operation as OutputOperationSchema)
@@ -37,7 +37,7 @@ export default function OutputActionConfig(props: OutputActionConfigProps) {
     <>
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">{intl.formatMessage({id: "config.expression"})}</label>
-            <ExpressionInput ref={expBuilder} title={intl.formatMessage({id: "config.expression"})} valueType={ValueType.String} expression={operation.expression} onChange={(exp)=>{updateOperation({...operation, expression: exp})}}></ExpressionInput>
+            <ExpressionInput title={intl.formatMessage({id: "config.expression"})} valueType={ValueType.String} expression={operation.expression} onChange={(_exp)=>updateOperation({...operation, expression: _exp})}></ExpressionInput>
         </div>
     </>)
 }

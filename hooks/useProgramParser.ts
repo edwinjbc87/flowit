@@ -57,28 +57,33 @@ export function useProgramParser() {
         let scopeHeight = 0;
         let tempSize:Dimension = {width: 0, height: 0};
     
-    
-        operations.forEach(operation => {
-            switch (operation.type) {
-                case OperationType.Loop: {
-                    const loop = operation as LoopOperationSchema
-                    tempSize = calculateNodeDimension(loop, operations)
-                    break
+        
+        if(operations.length > 0) {
+            operations.forEach(operation => {
+                switch (operation.type) {
+                    case OperationType.Loop: {
+                        const loop = operation as LoopOperationSchema
+                        tempSize = calculateNodeDimension(loop, operations)
+                        break
+                    }
+                    case OperationType.Condition: {
+                        const condition = operation as ConditionOperationSchema
+                        tempSize = calculateNodeDimension(condition, operations)
+                    }
+                    default: {
+                        scopeWidth = commonWidth
+                    }
                 }
-                case OperationType.Condition: {
-                    const condition = operation as ConditionOperationSchema
-                    tempSize = calculateNodeDimension(condition, operations)
+        
+                if(tempSize.width > scopeWidth) {
+                    scopeWidth = tempSize.width;
                 }
-                default: {
-                    scopeWidth = commonWidth
-                }
-            }
-    
-            if(tempSize.width > scopeWidth) {
-                scopeWidth = tempSize.width;
-            }
-            scopeHeight += tempSize.height + edgeHeight + 2*gap
-        })
+                scopeHeight += tempSize.height + edgeHeight + 2*gap
+            })
+        } else {
+            scopeWidth = commonWidth
+            scopeHeight = 50 + 2*gap
+        }
     
         return {width: scopeWidth, height: scopeHeight};
     }
