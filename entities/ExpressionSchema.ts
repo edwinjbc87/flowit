@@ -10,7 +10,10 @@ export enum ValueType {
     Number = "number",
     Boolean = "boolean",
     Array = "array",
+    Any = "any",
 }
+
+export type ExpressionValue = string | number | boolean | Array<string | number | boolean>;
 
 export interface VariableSchema {
     name: string;
@@ -33,6 +36,5 @@ export interface LiteralOperandSchema extends OperandSchema {
 
 export interface ExpressionSchema {
     operation: string;
-    left: ExpressionSchema | any;
-    right?: ExpressionSchema | any;
+    params: ExpressionSchema[];
 }

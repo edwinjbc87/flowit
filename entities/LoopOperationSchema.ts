@@ -3,6 +3,5 @@ import { ExpressionSchema, VariableSchema } from "./ExpressionSchema";
 
 
 export interface LoopOperationSchema extends BaseOperationSchema {
-    condition: ExpressionSchema;
-    operations: BaseOperationSchema[];
+    condition: ExpressionSchema|boolean;
 }

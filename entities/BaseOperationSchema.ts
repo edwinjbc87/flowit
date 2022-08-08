@@ -15,5 +15,5 @@ export interface BaseOperationSchema {
     type: OperationType;
     order: number;
     level: number;
-    parent?: number;
+    parent?: String;
 }

@@ -10,7 +10,6 @@ import { ProgramSchema } from "@/entities/ProgramSchema"
 import { Project, Module } from "@/entities/Project"
 import { Dimension } from "@/entities/Dimension"
 import { useIntl } from "react-intl"
-import { MdOutlineCatchingPokemon } from "react-icons/md"
 
 
 export function useProgramParser() {
@@ -26,15 +25,15 @@ export function useProgramParser() {
         } as Project;
     }
     
-    function calculateNodeDimension(operation:BaseOperationSchema): Dimension {
+    function calculateNodeDimension(operation:BaseOperationSchema, opers:BaseOperationSchema[]): Dimension {
         const gap = parseInt(String(process.env.DIAGRAM_NODE_GAP_WIDTH))
         const edgeHeight = parseInt(String(process.env.DIAGRAM_NODE_EDGE_HEIGHT))
         const commonWidth = parseInt(String(process.env.DIAGRAM_NODE_WIDTH))
         
         if(operation.type === OperationType.Condition) {
             const condition = operation as ConditionOperationSchema;
-            const yesSize = calculateScopeDimension(condition.yes)
-            const noSize = calculateScopeDimension(condition.no)
+            const yesSize = calculateScopeDimension(opers.filter(op=>op.parent == (condition.id+'_yes')))
+            const noSize = calculateScopeDimension(opers.filter(op=>op.parent == (condition.id+'_no')))
             
             return {
                 width: yesSize.width + noSize.width + 7*gap, 
@@ -42,7 +41,7 @@ export function useProgramParser() {
             };
         } else if(operation.type === OperationType.Loop) {
             const loop = operation as LoopOperationSchema;
-            const operationsSize = calculateScopeDimension(loop.operations);
+            const operationsSize = calculateScopeDimension(opers.filter(op=>op.parent == String(loop.id)));
     
             return {width: operationsSize.width + 2*gap, height: operationsSize.height + 2*gap + 50};
         } else {
@@ -58,28 +57,33 @@ export function useProgramParser() {
         let scopeHeight = 0;
         let tempSize:Dimension = {width: 0, height: 0};
     
-    
-        operations.forEach(operation => {
-            switch (operation.type) {
-                case OperationType.Loop: {
-                    const loop = operation as LoopOperationSchema
-                    tempSize = calculateNodeDimension(loop)
-                    break
+        
+        if(operations.length > 0) {
+            operations.forEach(operation => {
+                switch (operation.type) {
+                    case OperationType.Loop: {
+                        const loop = operation as LoopOperationSchema
+                        tempSize = calculateNodeDimension(loop, operations)
+                        break
+                    }
+                    case OperationType.Condition: {
+                        const condition = operation as ConditionOperationSchema
+                        tempSize = calculateNodeDimension(condition, operations)
+                    }
+                    default: {
+                        scopeWidth = commonWidth
+                    }
                 }
-                case OperationType.Condition: {
-                    const condition = operation as ConditionOperationSchema
-                    tempSize = calculateNodeDimension(condition)
+        
+                if(tempSize.width > scopeWidth) {
+                    scopeWidth = tempSize.width;
                 }
-                default: {
-                    scopeWidth = commonWidth
-                }
-            }
-    
-            if(tempSize.width > scopeWidth) {
-                scopeWidth = tempSize.width;
-            }
-            scopeHeight += tempSize.height + edgeHeight + 2*gap
-        })
+                scopeHeight += tempSize.height + edgeHeight + 2*gap
+            })
+        } else {
+            scopeWidth = commonWidth
+            scopeHeight = 50 + 2*gap
+        }
     
         return {width: scopeWidth, height: scopeHeight};
     }
@@ -98,18 +102,19 @@ export function useProgramParser() {
         const gap = parseInt(String(process.env.DIAGRAM_NODE_GAP_WIDTH))
         const edgeHeight = parseInt(String(process.env.DIAGRAM_NODE_EDGE_HEIGHT))
         let offset = gap + (offsetY?offsetY:0);
+        let filteredOperations = operations.filter(operation => (!parentNode && !operation.parent) || operation.parent == parentNode);
         let opers:BaseOperationSchema[] = [];
         try{
-            opers = operations.sort((a, b) => a.order - b.order);
+            opers = filteredOperations.sort((a, b) => a.order - b.order);
         }catch{
-            opers = operations;
+            opers = filteredOperations;
         }
     
         for(let i = 0; i < opers.length; i++) {
             let operation = opers[i];
     
             //#region Create node
-            const size = calculateNodeDimension(operation)
+            const size = calculateNodeDimension(operation, operations)
             const node = {
                 text: formatTitle(operation.name), 
                 name: operation.name,
@@ -129,21 +134,20 @@ export function useProgramParser() {
             if(size.width > diagram.dimension.width) {
                 diagram.dimension.width = size.width + 2*gap;
             }
-            
             //#endregion
     
             //#region Create subscope
             if(operation.type === OperationType.Loop) {
                 const loop = operation as LoopOperationSchema;
     
-                const dg = parseScope(loop.operations, size.width,String(operation.id), 50);
+                const dg = parseScope(operations, size.width, String(operation.id), 50);
                 diagram.nodes = diagram.nodes.concat(dg.nodes);
                 diagram.connections = diagram.connections.concat(dg.connections);
             } else if(operation.type === OperationType.Condition) {
                 const condition = operation as ConditionOperationSchema;
-    
-                const dg = parseScope(condition.yes, (size.width - 3*gap) / 2, String(operation.id+'_yes'), 50);
-                const dg2 = parseScope(condition.no, (size.width - 3*gap) / 2, String(operation.id+'_no'), 50);
+                
+                const dg = parseScope(operations, (size.width - 3*gap) / 2, String(operation.id+'_yes'), 50);
+                const dg2 = parseScope(operations, (size.width - 3*gap) / 2, String(operation.id+'_no'), 50);
     
                 node.width = dg.dimension.width + dg2.dimension.width + 3*gap;
                 const idxNode = diagram.nodes.findIndex(n => n.id === String(operation.id));
@@ -183,13 +187,11 @@ export function useProgramParser() {
                 diagram.connections = diagram.connections.concat(dg2.connections);
     
                 diagram.dimension.height += Math.max(dg.dimension.height, dg2.dimension.height) + 4*gap + 100
-                offset += Math.max(dg.dimension.height, dg2.dimension.height) + edgeHeight + 4*gap + 100;
+                offset += Math.max(dg.dimension.height, dg2.dimension.height) + edgeHeight + 100;
             } else {
                 diagram.dimension.height += size.height + edgeHeight + 2*gap
                 offset += size.height + edgeHeight;
             }
-    
-            
             //#endregion
     
             //#region Create connection
@@ -198,7 +200,7 @@ export function useProgramParser() {
                     id: operation.id,
                     type: NodeConnectionType.Default,
                     from: operation.id,
-                    to: operations[i + 1].id
+                    to: opers[i + 1].id
                 } as NodeConnection);
             }
             //#endregion

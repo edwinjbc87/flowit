@@ -1,4 +1,7 @@
+import { BaseOperationSchema, OperationType } from '@/entities/BaseOperationSchema';
+import { ConditionOperationSchema } from '@/entities/ConditionOperationSchema';
 import { Diagram } from '@/entities/Diagram';
+import { LoopOperationSchema } from '@/entities/LoopOperationSchema';
 import { NodeConnectionType } from '@/entities/NodeConnection';
 import { ProgramExecution } from '@/entities/ProgramExecution';
 import { ProgramSchema } from '@/entities/ProgramSchema';
@@ -34,6 +37,16 @@ const initialState: ProgramState = {
         main: '',
         modules: [],
     }
+}
+
+const findOperation = (id: string, scope:BaseOperationSchema[]) => {
+    for(const operation of scope) {
+        if(String(operation.id) === id) {
+            return operation
+        }
+    }
+
+    return null;
 }
 
 export const programSlice = createSlice({
@@ -90,6 +103,14 @@ export const programSlice = createSlice({
         },
         setProgram: (state, action) => {
             state.program = action.payload
+        },
+        setOperationName: (state, action) => {
+            const { id, name } = action.payload
+            const operations = state.program.modules[state.currentModuleIndex].operations
+            const op = findOperation(id, operations);
+            if(op) {
+                op.name = name
+            }
         }
     },
     extraReducers: (builder)=>{
@@ -97,5 +118,5 @@ export const programSlice = createSlice({
     }
 })
 
-export const { setProgram, setDiagram, setProject, setCurrentModule, setExecution, setExecutionVariable, addExecutionOutput } = programSlice.actions
+export const { setProgram, setDiagram, setProject, setCurrentModule, setExecution, setExecutionVariable, addExecutionOutput, setOperationName } = programSlice.actions
 export default programSlice.reducer

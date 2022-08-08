@@ -1,0 +1,12 @@
+.expression-input__selector select{
+    width: 80px;
+}
+
+.expression-input__selector button{
+    width: 30px;
+    margin-left: 5px;
+}
+
+.expression-input__params{
+    padding-left: 20px;
+}

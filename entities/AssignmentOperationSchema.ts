@@ -1,7 +1,7 @@
 import { BaseOperationSchema } from "./BaseOperationSchema";
 import { ExpressionSchema } from "./ExpressionSchema";
 
-export interface AsignmentOperationSchema extends BaseOperationSchema {
+export interface AssignmentOperationSchema extends BaseOperationSchema {
     variable: string;
-    expression: ExpressionSchema;
+    expression: ExpressionSchema|any;
 }
