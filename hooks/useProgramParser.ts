@@ -27,7 +27,6 @@ export function useProgramParser() {
     
     function calculateNodeDimension(operation:BaseOperationSchema, opers:BaseOperationSchema[]): Dimension {
         const gap = parseInt(String(process.env.DIAGRAM_NODE_GAP_WIDTH))
-        const edgeHeight = parseInt(String(process.env.DIAGRAM_NODE_EDGE_HEIGHT))
         const commonWidth = parseInt(String(process.env.DIAGRAM_NODE_WIDTH))
         
         if(operation.type === OperationType.Condition) {
@@ -178,8 +177,7 @@ export function useProgramParser() {
                     height: dg2.dimension.height,
                     parentNode: String(operation.id)
                 })
-    
-    
+
                 diagram.nodes = diagram.nodes.concat(dg.nodes);
                 diagram.connections = diagram.connections.concat(dg.connections);
     
