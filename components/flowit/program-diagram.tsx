@@ -21,21 +21,21 @@ export interface IProgram{
 }
 
 export default function ProgramDiagram() {
-    const intl = useIntl();
+    const intl = useIntl()
     
-    const {diagram, handler} = useProgram();
-    const [dlgSelAction, setDlgSelAction] = useState(false);
-    const [nodes, setNodes] = useState<Node[]>([]);
-    const [edges, setEdges] = useState<Edge[]>([]);
-    const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null);
-    const [selectedOperation, setSelectedOperation] = useState<BaseOperationSchema|null|undefined>(null);
+    const {diagram, handler} = useProgram()
+    const [dlgSelAction, setDlgSelAction] = useState(false)
+    const [nodes, setNodes] = useState<Node[]>([])
+    const [edges, setEdges] = useState<Edge[]>([])
+    const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null)
+    const [selectedOperation, setSelectedOperation] = useState<BaseOperationSchema|null|undefined>(null)
 
     const editNode = (id: string) => {
         setSelectedOperation(handler.getOperation(id))
     }
 
     const addNode = async (operation: NodeType) => {
-        const op = await handler.getDefaultOperation(String(operation) as OperationType, parseInt(selectedEdge?selectedEdge.target:"1"));
+        const op = await handler.getDefaultOperation(String(operation) as OperationType, parseInt(selectedEdge?selectedEdge.target:"1"))
         setSelectedOperation(op)
     }
 
@@ -77,9 +77,10 @@ export default function ProgramDiagram() {
             target: String(c.to),
             type: 'straight',
             markerEnd: {type: MarkerType.Arrow},
-            data: {label: c.type != NodeConnectionType.Default ? c.type : ""}
-        })));
-    }, [diagram]);
+            data: {label: c.type != NodeConnectionType.Default ? c.type : ""},
+            zIndex: c.zIndex,
+        })))
+    }, [diagram])
 
     return (
         <div>

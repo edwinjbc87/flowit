@@ -7,8 +7,9 @@ export enum NodeConnectionType {
 }
 
 export interface NodeConnection {
-    id: number;
+    id: String;
     from: number;
     to: number;
     type: NodeConnectionType;
+    zIndex: number;
 }

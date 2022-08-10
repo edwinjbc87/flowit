@@ -58,7 +58,28 @@ export default function useProgram() {
         for(const op of postOpers) {
             op.order += 1;
         }
-        _program.modules[currentModuleIndex].operations.push({...operation, order: prevOper.order + 1});
+
+        _program.modules[currentModuleIndex].operations.push({...operation, order: prevOper.order + 1, level: prevOper.level, parent: prevOper.parent});
+
+        if(operation.type == OperationType.Loop) {
+            const _start = {...(await getDefaultOperation(OperationType.Start, 0)), parent: String(operation.id), name: "Inicio", id: operation.id + 1, level: prevOper.level + 1};
+            const _end = {...(await getDefaultOperation(OperationType.End, 1)), parent: String(operation.id), name: "Fin", id: operation.id + 2, level: prevOper.level + 1}
+
+            _program.modules[currentModuleIndex].operations.push(_start);
+            _program.modules[currentModuleIndex].operations.push(_end);
+        } else if(operation.type == OperationType.Condition) {
+            const _startYes = {...(await getDefaultOperation(OperationType.Start, 0)), parent: String(operation.id + '_yes'), name: "Inicio", id: operation.id + 1, level: prevOper.level + 1}
+            const _endYes = {...(await getDefaultOperation(OperationType.End, 1)), parent: String(operation.id + '_yes'), name: "Fin", id: operation.id + 2, level: prevOper.level + 1}
+            const _startNo = {...(await getDefaultOperation(OperationType.Start, 0)), parent: String(operation.id + '_no'), name: "Inicio", id: operation.id + 3, level: prevOper.level + 1}
+            const _endNo = {...(await getDefaultOperation(OperationType.End, 1)), parent: String(operation.id + '_no'), name: "Fin", id: operation.id + 4, level: prevOper.level + 1}
+
+
+            _program.modules[currentModuleIndex].operations.push(_startYes)
+            _program.modules[currentModuleIndex].operations.push(_endYes)
+            _program.modules[currentModuleIndex].operations.push(_startNo)
+            _program.modules[currentModuleIndex].operations.push(_endNo)
+        }
+
         const _project = await parseSchema(_program)
 
         await dispatch(setProgram(_program))
@@ -191,6 +212,12 @@ export default function useProgram() {
             }
             case OperationType.Output: {
                 return {...newOperation, expression: ""} as OutputOperationSchema
+            }
+            case OperationType.Start: {
+                return {...newOperation} as BaseOperationSchema
+            }
+            case OperationType.End: {
+                return {...newOperation} as BaseOperationSchema
             }
         }
         return newOperation as BaseOperationSchema
