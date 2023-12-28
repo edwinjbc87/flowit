@@ -1,31 +1,17 @@
-import { BaseOperationSchema, OperationType } from '@/entities/BaseOperationSchema';
-import { ConditionOperationSchema } from '@/entities/ConditionOperationSchema';
-import { Diagram } from '@/entities/Diagram';
-import { LoopOperationSchema } from '@/entities/LoopOperationSchema';
 import { NodeConnectionType } from '@/entities/NodeConnection';
 import { ProgramExecution } from '@/entities/ProgramExecution';
 import { ProgramSchema } from '@/entities/ProgramSchema';
 import { Project } from '@/entities/Project';
+import { findOperation } from '@/libs/flowit/Utils';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 export interface ProgramState {
-    diagram: Diagram;
-    project: Project;
     currentModuleIndex: number;
     execution: ProgramExecution;
     program: ProgramSchema;
 }
 
 const initialState: ProgramState = {
-    diagram: {
-        nodes: [],
-        connections: [],
-        dimension: {width: 0, height: 0}
-    },
-    project: {
-        main: '',
-        modules: [],
-    },
     currentModuleIndex: 0,
     execution: {
         isRunning: false,
@@ -39,58 +25,41 @@ const initialState: ProgramState = {
     }
 }
 
-const findOperation = (id: string, scope:BaseOperationSchema[]) => {
-    for(const operation of scope) {
-        if(String(operation.id) === id) {
-            return operation
-        }
-    }
-
-    return null;
-}
-
 export const programSlice = createSlice({
     name: 'program',
     initialState,
     reducers: {
-        setDiagram: (state, action) => { state.diagram = action.payload; },
+        setDiagram: (state, action) => { state.program.modules[state.currentModuleIndex].diagram= action.payload; },
         deleteConnection: (state, action) => { 
-            state.diagram.connections = state.diagram.connections.filter(con => con.id != action.payload)
+            state.program.modules[state.currentModuleIndex].diagram.connections = state.program.modules[state.currentModuleIndex].diagram.connections.filter(con => con.id != action.payload)
         },
         deleteNode: (state, action) => {
-            state.diagram.nodes = state.diagram.nodes.filter(node => node.id != action.payload)
-            state.diagram.connections = state.diagram.connections.filter(con => con.from != action.payload && con.to != action.payload)
+            state.program.modules[state.currentModuleIndex].diagram.nodes = state.program.modules[state.currentModuleIndex].diagram.nodes.filter(node => node.id != action.payload)
+            state.program.modules[state.currentModuleIndex].diagram.connections = state.program.modules[state.currentModuleIndex].diagram.connections.filter(con => con.from != action.payload && con.to != action.payload)
         },
         addConnection: (state, action) => {
-            state.diagram.connections.splice(state.diagram.connections.length-1,0,action.payload)
+            state.program.modules[state.currentModuleIndex].diagram.connections.splice(state.program.modules[state.currentModuleIndex].diagram.connections.length-1,0,action.payload)
         },
         addNode: (state, action) => {
-            state.diagram.nodes.splice(state.diagram.nodes.length-1,0,action.payload.node)
-            state.diagram.connections.splice(state.diagram.connections.length-1,0,action.payload.connections)
+            state.program.modules[state.currentModuleIndex].diagram.nodes.splice(state.program.modules[state.currentModuleIndex].diagram.nodes.length-1,0,action.payload.node)
+            state.program.modules[state.currentModuleIndex].diagram.connections.splice(state.program.modules[state.currentModuleIndex].diagram.connections.length-1,0,action.payload.connections)
         },
         insertNodeAndConnections: (state, action) => {
             const { node, insertConnection, connections } = action.payload
 
-            const idx  = state.diagram.connections.findIndex(con => con.id == insertConnection.id)
-            // const beforeNode = state.diagram.nodes.find(n => n.id == insertConnection.from.id)
-            // const afterNode = state.diagram.nodes.find(n => n.id == insertConnection.to.id)
+            const idx  = state.program.modules[state.currentModuleIndex].diagram.connections.findIndex(con => con.id == insertConnection.id)
             let connectionType = NodeConnectionType.Default
             if (idx != -1) {
-                connectionType = state.diagram.connections[idx].type
-                state.diagram.connections.splice(idx, 1)
+                connectionType = state.program.modules[state.currentModuleIndex].diagram.connections[idx].type
+                state.program.modules[state.currentModuleIndex].diagram.connections.splice(idx, 1)
             }
             
-            state.diagram.nodes.splice(state.diagram.nodes.length-1, 0, node)
-            state.diagram.connections.splice(state.diagram.connections.length-1, 0, connections)
-        },
-        setProject: (state, action) => { 
-            state.project = action.payload; 
-            state.currentModuleIndex = state.project.modules.findIndex(module => module.name == state.project.main)
-            state.diagram = state.project.modules[state.currentModuleIndex].diagram
+            state.program.modules[state.currentModuleIndex].diagram.nodes.splice(state.program.modules[state.currentModuleIndex].diagram.nodes.length-1, 0, node)
+            state.program.modules[state.currentModuleIndex].diagram.connections.splice(state.program.modules[state.currentModuleIndex].diagram.connections.length-1, 0, connections)
         },
         setCurrentModule: (state, action) => { 
-            state.currentModuleIndex = state.project.modules.findIndex(module => module.name == action.payload)
-            state.diagram = state.project.modules[state.currentModuleIndex].diagram
+            state.currentModuleIndex = state.program.modules.findIndex(module => module.name == action.payload)
+            state.program.modules[state.currentModuleIndex].diagram= state.program.modules[state.currentModuleIndex].diagram
         },
         setExecution: (state, action) => {
             state.execution = { ...state.execution, ...action.payload }
@@ -107,7 +76,7 @@ export const programSlice = createSlice({
         setOperationName: (state, action) => {
             const { id, name } = action.payload
             const operations = state.program.modules[state.currentModuleIndex].operations
-            const op = findOperation(id, operations);
+            const op = findOperation(Number(id), operations);
             if(op) {
                 op.name = name
             }
@@ -118,5 +87,5 @@ export const programSlice = createSlice({
     }
 })
 
-export const { setProgram, setDiagram, setProject, setCurrentModule, setExecution, setExecutionVariable, addExecutionOutput, setOperationName } = programSlice.actions
+export const { setProgram, setDiagram, setCurrentModule, setExecution, setExecutionVariable, addExecutionOutput, setOperationName } = programSlice.actions
 export default programSlice.reducer

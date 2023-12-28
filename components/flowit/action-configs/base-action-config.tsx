@@ -14,7 +14,7 @@ import LoopActionConfig from "./loop-action-config";
 
 interface BaseActionConfigProps {
     operation: BaseOperationSchema,
-    children: React.ReactNode,
+    children?: React.ReactNode,
     onDismiss: () => void,
     onSave: (operation: BaseOperationSchema) => void,
 }

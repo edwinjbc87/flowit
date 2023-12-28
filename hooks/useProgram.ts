@@ -1,7 +1,7 @@
 import { RootState, useAppDispatch } from "store"
 import { useSelector } from "react-redux"
 import { Diagram } from "@/entities/Diagram"
-import { setDiagram, setProject, setProgram, setCurrentModule, setExecution, addExecutionOutput, setExecutionVariable, setOperationName } from "store/slices/programSlice"
+import { setProgram, setCurrentModule, setExecution, addExecutionOutput, setExecutionVariable, setOperationName } from "store/slices/programSlice"
 import { Project } from "@/entities/Project"
 import { ProgramExecution } from "@/entities/ProgramExecution"
 import { ProgramSchema } from "@/entities/ProgramSchema"
@@ -10,33 +10,31 @@ import { BaseOperationSchema, OperationType } from "@/entities/BaseOperationSche
 import { DeclarationOperationSchema } from "@/entities/DeclarationOperationSchema"
 import { AssignmentOperationSchema } from "@/entities/AssignmentOperationSchema"
 import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { OutputOperationSchema } from "@/entities/OutputOperationSchema"
 import { InputOperationSchema } from "@/entities/InputOperationSchema"
 import { ConditionOperationSchema } from "@/entities/ConditionOperationSchema"
 import { LoopOperationSchema } from "@/entities/LoopOperationSchema"
 import { useProgramParser } from "hooks/useProgramParser"
 import IOperationFunction from "@/libs/flowit/IOperationFunction"
-import { Functions } from "@/libs/flowit/Functions"
+import { Functions } from "@/libs/flowit/Enums"
+import { findOperation } from "@/libs/flowit/Utils"
 
 export default function useProgram() {
     const dispatch = useAppDispatch()
-    const project = useSelector((state: RootState) => state.program.project)
     const program = useSelector((state: RootState) => state.program.program)
     const currentModuleIndex = useSelector((state: RootState) => state.program.currentModuleIndex)
-    const diagram = useSelector<RootState, Diagram>(state => state.program.diagram)
+    const diagram = useSelector<RootState, Diagram>(state => state.program.program.modules[currentModuleIndex]?.diagram)
     const execution = useSelector<RootState, ProgramExecution>(state => state.program.execution)
-    const { parseSchema } = useProgramParser()
+    const { parseModule } = useProgramParser()
 
-    const _setDiagram = async (diagram: Diagram) => await dispatch(setDiagram(diagram))
-    const _setProject = async (project: Project) => await dispatch(setProject(project))
-    const _setProgram = async (_program: ProgramSchema) => {
-        const _project = parseSchema(_program)
-        await dispatch(setProgram(_program))
-        await dispatch(setProject(_project))
+    // const _setDiagram = async (diagram: Diagram) => await dispatch(setDiagram(diagram))
+    // const _setProject = async (project: Project) => await dispatch(setProject(project))
+    const _setProgram = async (_program: ProgramSchema) => {                
+        await dispatch(setProgram({..._program, modules: _program.modules.map(module => ({...module, diagram: parseModule(module)} as ModuleSchema))}))
     }
     const _setCurrentModule = async (name: string) => await dispatch(setCurrentModule(name))
-    const getCurrentModule = () => project.modules[currentModuleIndex]
+    const getCurrentModule = () => program.modules[currentModuleIndex]
     
     const variables = useRef(new Map<string, any>())
 
@@ -48,46 +46,66 @@ export default function useProgram() {
         await findAndUpdateOperation(String(operation.id), operation, program.modules[currentModuleIndex].operations)
     }
 
-    const addOperation = async (operation: BaseOperationSchema, previousId: String) => {
-        const _program = JSON.parse(JSON.stringify(program));
-        const prevOper = _program.modules[currentModuleIndex].operations.find(op => String(op.id) == String(previousId));
-        if(!prevOper) {
-            throw new Error("Previous operation not found")
-        }
-        const postOpers = _program.modules[currentModuleIndex].operations.filter(op => op.order > prevOper.order);
-        for(const op of postOpers) {
-            op.order += 1;
-        }
-
-        _program.modules[currentModuleIndex].operations.push({...operation, order: prevOper.order + 1, level: prevOper.level, parent: prevOper.parent});
-
-        if(operation.type == OperationType.Loop) {
-            const _start = {...(await getDefaultOperation(OperationType.Start, 0)), parent: String(operation.id), name: "Inicio", id: operation.id + 1, level: prevOper.level + 1};
-            const _end = {...(await getDefaultOperation(OperationType.End, 1)), parent: String(operation.id), name: "Fin", id: operation.id + 2, level: prevOper.level + 1}
-
-            _program.modules[currentModuleIndex].operations.push(_start);
-            _program.modules[currentModuleIndex].operations.push(_end);
-        } else if(operation.type == OperationType.Condition) {
-            const _startYes = {...(await getDefaultOperation(OperationType.Start, 0)), parent: String(operation.id + '_yes'), name: "Inicio", id: operation.id + 1, level: prevOper.level + 1}
-            const _endYes = {...(await getDefaultOperation(OperationType.End, 1)), parent: String(operation.id + '_yes'), name: "Fin", id: operation.id + 2, level: prevOper.level + 1}
-            const _startNo = {...(await getDefaultOperation(OperationType.Start, 0)), parent: String(operation.id + '_no'), name: "Inicio", id: operation.id + 3, level: prevOper.level + 1}
-            const _endNo = {...(await getDefaultOperation(OperationType.End, 1)), parent: String(operation.id + '_no'), name: "Fin", id: operation.id + 4, level: prevOper.level + 1}
-
-
-            _program.modules[currentModuleIndex].operations.push(_startYes)
-            _program.modules[currentModuleIndex].operations.push(_endYes)
-            _program.modules[currentModuleIndex].operations.push(_startNo)
-            _program.modules[currentModuleIndex].operations.push(_endNo)
+    const patchOperation = (operation: BaseOperationSchema, operations: BaseOperationSchema[], previousId: number): BaseOperationSchema[] => {
+        for(let i = 0; i < operations.length; i++) {
+            if(operations[i].id == previousId) {
+                operations.splice(i+1, 0, operation);
+                break;
+            } else if(operations[i].type == OperationType.Loop) {
+                const loop = operations[i] as LoopOperationSchema;
+                loop.yesOperations = patchOperation(operation, [...loop.yesOperations], previousId);
+            } else if(operations[i].type == OperationType.Condition) {
+                const condition = operations[i] as ConditionOperationSchema;
+                condition.yesOperations = patchOperation(operation, [...condition.yesOperations], previousId);
+                condition.noOperations = patchOperation(operation, [...condition.noOperations], previousId);
+            }
         }
 
-        const _project = await parseSchema(_program)
-
-        await dispatch(setProgram(_program))
-        await dispatch(setProject(_project))
+        return operations;
     }
 
-    const findOperation = (id: string) => {
-        return program.modules[currentModuleIndex].operations.find(op => String(op.id) == String(id))
+    const addOperation = async (operation: BaseOperationSchema, previousId: number) => {
+        const baseId = new Date().getTime();
+        const _program:ProgramSchema = JSON.parse(JSON.stringify(program));
+        //const prevOper = _program.modules[currentModuleIndex].operations.find(op => String(op.id) == String(previousId));
+        // const prevIndex = _program.modules[currentModuleIndex].operations.findIndex(op => (op.id) == (previousId));
+
+        // if(prevIndex < 0) {
+        //     throw new Error("Previous operation not found")
+        // }
+
+        let op = {...operation, id: baseId};
+
+        if(operation.type == OperationType.Loop) {
+            op = {...(await getDefaultOperation(OperationType.Loop)), ...op,
+                id: op.id, 
+                level: op.level,
+                yesOperations: [
+                    {...(await getDefaultOperation(OperationType.Start)), parent: op.id, name: "Inicio", id: op.id + 1, level: op.level + 1},
+                    {...(await getDefaultOperation(OperationType.End)), parent: op.id, name: "Fin", id: op.id + 2, level: op.level + 1}
+                ],
+            } as LoopOperationSchema;
+        } else if(operation.type == OperationType.Condition) {
+            op = {...(await getDefaultOperation(OperationType.Condition)), ...op,
+                level: op.level,
+                yesOperations: [
+                    {...(await getDefaultOperation(OperationType.Start)), parent: op.id, name: "Inicio", id: op.id + 1, level: op.level + 1},
+                    {...(await getDefaultOperation(OperationType.End)), parent: op.id, name: "Fin", id: op.id + 2, level: op.level + 1}
+                ],
+                noOperations: [
+                    {...(await getDefaultOperation(OperationType.Start)), parent: op.id, name: "Inicio", id: op.id + 3, level: op.level + 1},
+                    {...(await getDefaultOperation(OperationType.End)), parent: op.id, name: "Fin", id: op.id + 4, level: op.level + 1}
+                ],
+            } as ConditionOperationSchema;
+        } 
+        
+        _program.modules[currentModuleIndex].operations = patchOperation(op, _program.modules[currentModuleIndex].operations, previousId);
+
+        await _setProgram(_program);
+    }
+
+    const _findOperation = (id: number, opers?: BaseOperationSchema[]): BaseOperationSchema|null => {
+        return findOperation(id, opers ?? program.modules[currentModuleIndex].operations);
     }
 
     const findAndUpdateOperation = async (id: string, operation: BaseOperationSchema, operations:BaseOperationSchema[]) => {
@@ -95,9 +113,8 @@ export default function useProgram() {
         const operIndex = _program.modules[currentModuleIndex].operations.findIndex(op => String(op.id) == String(id))
         if(operIndex >= 0) {
             _program.modules[currentModuleIndex].operations[operIndex] = operation
-            const _project = parseSchema(_program)
-            await dispatch(setProgram(_program))
-            await dispatch(setProject(_project))
+            
+            await dispatch(setProgram({..._program, modules: _program.modules.map(module => ({...module, diagram: parseModule(module)} as ModuleSchema))}))
         }
     }
 
@@ -189,11 +206,8 @@ export default function useProgram() {
         return val
     }
 
-    const getDefaultOperation = async (operation:OperationType, order?:number):Promise<BaseOperationSchema> => {
-        const _program = JSON.parse(JSON.stringify(program));
-        const lastOp = (_program.modules[currentModuleIndex].operations.sort((a,b) => b.id - a.id) as BaseOperationSchema[])[0]
-
-        const newOperation = {id: lastOp.id + 1, name: "", type: operation, order}
+    const getDefaultOperation = async (operation:OperationType):Promise<BaseOperationSchema> => {
+        const newOperation = {id: new Date().getTime(), name: "", type: operation, level: 0}
         switch(operation) {
             case OperationType.Declaration: {
                 return {...newOperation, variable: {name: "", type: ValueType.String}} as DeclarationOperationSchema
@@ -291,5 +305,10 @@ export default function useProgram() {
         }
     }
 
-    return {program, project, diagram, currentModuleIndex, execution, handler: {setDiagram: _setDiagram, setProject: _setProject, setCurrentModule: _setCurrentModule, setProgram: _setProgram, getCurrentModule, runProgram, renameOperation, updateOperation: findAndUpdateOperation, saveOperation, getOperation: findOperation, isExpression, getExpressionDefinition, addOperation, getDefaultOperation}}
+    // useEffect(() => {
+    //     const proy:Project = parseSchema(program);
+    //     _setProject(proy).catch(console.error);
+    // }, [program]);
+
+    return {program, diagram, currentModuleIndex, execution, handler: {setCurrentModule: _setCurrentModule, setProgram: _setProgram, getCurrentModule, runProgram, renameOperation, updateOperation: findAndUpdateOperation, saveOperation, getOperation: _findOperation, isExpression, getExpressionDefinition, addOperation, getDefaultOperation}}
 }
