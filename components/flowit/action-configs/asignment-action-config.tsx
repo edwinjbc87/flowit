@@ -27,7 +27,7 @@ export default function AssignmentActionConfig(props: AssignmentActionConfigProp
     }
 
     useEffect(() => {
-        const _vars = program.modules[currentModuleIndex].operations.filter(o=>o.order < operation.order && o.type == OperationType.Declaration).map(o => (o as DeclarationOperationSchema).variable.name)
+        const _vars = program.modules[currentModuleIndex].operations.filter(o=>o.type == OperationType.Declaration).map(o => (o as DeclarationOperationSchema).variable.name)
         
         setVariables(_vars);
         if(props.operation){
