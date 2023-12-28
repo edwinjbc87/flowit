@@ -238,7 +238,7 @@ export default function useProgram() {
     }
 
     const runScope = async (operations: BaseOperationSchema[], parentId?:string)=>{
-        const opers = JSON.parse(JSON.stringify(operations)).filter(op=> (!op.parent && !parent) || (op.parent == parentId)).sort((a,b) => a.order - b.order) as BaseOperationSchema[]
+        const opers = operations as BaseOperationSchema[]
 
         for(let i = 0; i < opers.length; i++) {
             let operation = opers[i]
@@ -283,9 +283,9 @@ export default function useProgram() {
                     let condition = (operation as ConditionOperationSchema).condition
                     
                     if(await evaluateExpression(condition)) {
-                        await runScope(operations, String(operation.id+'_yes'))
+                        await runScope((operation as ConditionOperationSchema).yesOperations)
                     } else {
-                        await runScope(operations, String(operation.id+'_no'))
+                        await runScope((operation as ConditionOperationSchema).noOperations)
                     }
                     
                     break
@@ -295,7 +295,7 @@ export default function useProgram() {
                     let condition = (operation as LoopOperationSchema).condition
 
                     while(await evaluateExpression(condition)) {
-                        await runScope(operations, String(operation.id))
+                        await runScope((operation as ConditionOperationSchema).yesOperations)
                     }
                     
                     break
