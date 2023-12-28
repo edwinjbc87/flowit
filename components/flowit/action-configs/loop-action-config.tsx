@@ -30,7 +30,7 @@ export default function LoopActionConfig(props: LoopActionConfigProps) {
             setOperation(props.operation as LoopOperationSchema)
         }
 
-        setVariables(program.modules[currentModuleIndex].operations.filter(o=>o.order < operation.order && o.type == OperationType.Declaration).map(o => (o as DeclarationOperationSchema).variable.name));
+        setVariables(program.modules[currentModuleIndex].operations.filter(o=>o.type == OperationType.Declaration).map(o => (o as DeclarationOperationSchema).variable.name));
     }, [props.operation])
 
     return (
