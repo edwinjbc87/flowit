@@ -129,9 +129,9 @@ export function useProgramParser() {
                 diagram.nodes.splice(diagram.nodes.length, 0, ...dg.nodes);
                 diagram.connections.splice(diagram.connections.length, 0, ...dg.connections);                
             } else if(operation.type === OperationType.Condition) {                
-                const dg = parseScope((operation as ConditionOperationSchema).yesOperations, (size.width - 3*gap) / 2, String(operation.id+'_yes'), commonHeight + gap);
-                const dg2 = parseScope((operation as ConditionOperationSchema).noOperations, (size.width - 3*gap) / 2, String(operation.id+'_no'), commonHeight + gap);
-                                
+                const dg1Dim = calculateScopeDimension((operation as ConditionOperationSchema).yesOperations);
+                const dg2Dim = calculateScopeDimension((operation as ConditionOperationSchema).noOperations);
+
                 const yesNode = {
                     text: intl.formatMessage({id: 'actions.yes'}), 
                     name: intl.formatMessage({id: 'actions.yes'}), 
@@ -139,8 +139,8 @@ export function useProgramParser() {
                     id: operation.id + '_yes',
                     x: gap,
                     y: commonHeight + gap,
-                    width: dg.dimension.width + 2*gap,
-                    height: dg.dimension.height + commonHeight + 2*gap,
+                    width: dg1Dim.width,
+                    height: dg1Dim.height,
                     parentNode: String(operation.id)
                 };                
     
@@ -149,15 +149,20 @@ export function useProgramParser() {
                     name: intl.formatMessage({id: 'actions.no'}), 
                     type: NodeType.No,
                     id: operation.id + '_no',
-                    x: 2*gap + yesNode.width,
+                    x: 2*gap + dg1Dim.width,
                     y: commonHeight + gap,
-                    width: dg2.dimension.width + 2*gap,
-                    height: dg2.dimension.height + commonHeight + 2*gap,
+                    width: dg2Dim.width,
+                    height: dg2Dim.height,
                     parentNode: String(operation.id)
                 };
 
                 diagram.nodes.push(yesNode);
                 diagram.nodes.push(noNode);
+
+
+                const dg = parseScope((operation as ConditionOperationSchema).yesOperations, dg1Dim.width, String(operation.id+'_yes'), commonHeight + gap);
+                const dg2 = parseScope((operation as ConditionOperationSchema).noOperations, dg2Dim.width, String(operation.id+'_no'), commonHeight + gap);
+                
 
                 diagram.nodes = diagram.nodes.concat(dg.nodes);
                 diagram.connections = diagram.connections.concat(dg.connections);
