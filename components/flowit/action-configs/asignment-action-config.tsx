@@ -31,7 +31,7 @@ export default function AssignmentActionConfig(props: AssignmentActionConfigProp
         
         setVariables(_vars);
         if(props.operation){
-            setOperation({...props.operation, variable: _vars.length > 0 ? _vars[0] : ""} as AssignmentOperationSchema)
+            setOperation({...props.operation, variable: _vars.length > 0 ? ((props.operation as AssignmentOperationSchema).variable ?? _vars[0]) : ""} as AssignmentOperationSchema)
         }
     }, [props.operation])
 
