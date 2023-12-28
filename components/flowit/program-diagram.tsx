@@ -15,6 +15,7 @@ import { Node, Edge } from 'react-flow-renderer'
 import BaseActionConfig from "./action-configs/base-action-config"
 import { BaseOperationSchema, OperationType } from "@/entities/BaseOperationSchema"
 import { NodeType } from "@/entities/Node"
+import { useProgramParser } from "@/hooks/useProgramParser"
 
 export interface IProgram{
     diagram: Diagram;
@@ -23,7 +24,8 @@ export interface IProgram{
 export default function ProgramDiagram() {
     const intl = useIntl()
     
-    const {diagram, handler} = useProgram()
+    const {diagram, currentModuleIndex, handler} = useProgram()
+    const {flatNodes} = useProgramParser()
     const [dlgSelAction, setDlgSelAction] = useState(false)
     const [nodes, setNodes] = useState<Node[]>([])
     const [edges, setEdges] = useState<Edge[]>([])
@@ -31,12 +33,13 @@ export default function ProgramDiagram() {
     const [selectedOperation, setSelectedOperation] = useState<BaseOperationSchema|null|undefined>(null)
 
     const editNode = (id: string) => {
-        setSelectedOperation(handler.getOperation(id))
+        setSelectedOperation(handler.getOperation(Number(id)));
     }
 
     const addNode = async (operation: NodeType) => {
-        const op = await handler.getDefaultOperation(String(operation) as OperationType, parseInt(selectedEdge?selectedEdge.target:"1"))
-        setSelectedOperation(op)
+        const op = await handler.getDefaultOperation(String(operation) as OperationType);
+        const prevOp = handler.getOperation(Number(selectedEdge?.source ?? 0));        
+        setSelectedOperation({...op, parent: Number(prevOp?.parent ?? 0), level: Number(prevOp?.level ?? 0)})
     }
 
     const onClickEdge = (edge: Edge) => {
@@ -46,7 +49,7 @@ export default function ProgramDiagram() {
 
     const saveOperation = async (operation: BaseOperationSchema) => {
         if(selectedEdge != null){
-            await handler.addOperation(operation, selectedEdge.source)
+            await handler.addOperation(operation, Number(selectedEdge.source))
         } else {
             await handler.saveOperation(operation)
         }
@@ -57,6 +60,9 @@ export default function ProgramDiagram() {
     }
 
     useEffect(() => {
+        console.log("Index", currentModuleIndex);
+        console.log("Diagram", diagram);
+
         setNodes(diagram?.nodes.map(n=>{
             const node = {
                 id: String(n.id),
@@ -64,12 +70,12 @@ export default function ProgramDiagram() {
                 style: {width: n.width, height: n.height},
                 position: {x: Number(String(n.x)), y: Number(String(n.y))}
             } as Node
-            if(n.parentNode){
+            if(n.parentNode && n.parentNode != "0"){
                 node.parentNode = String(n.parentNode)
             }
 
             return node;
-        }));
+        }) ?? []);
 
         setEdges(diagram?.connections.map(c => ({
             id: String(c.id),
@@ -79,22 +85,21 @@ export default function ProgramDiagram() {
             markerEnd: {type: MarkerType.Arrow},
             data: {label: c.type != NodeConnectionType.Default ? c.type : ""},
             zIndex: c.zIndex,
-        })))
+        })) ?? [])
     }, [diagram])
 
     return (
         <div>
             <FilesNavigation></FilesNavigation>
             <section className={styles.diagram} id="diagram">
-                {diagram && diagram.nodes.length > 0 && <ReactFlow defaultNodes={nodes} edges={edges} nodesDraggable={true} onEdgeClick={(ev, edge)=>onClickEdge(edge)} onNodeClick={(ev, n)=>editNode(n.id)}>
+                {diagram && diagram?.nodes.length > 0 && <ReactFlow defaultNodes={nodes} edges={edges} nodesDraggable={true} onEdgeClick={(ev, edge)=>onClickEdge(edge)} onNodeClick={(ev, n)=>editNode(n.id)}>
                     <Background />
                     <Controls />
                 </ReactFlow>}
             </section>
             {dlgSelAction && <ActionSelector onSelectedOperation={addNode} onDismiss={()=>{setDlgSelAction(false)}}></ActionSelector>}
             {selectedOperation && 
-                <BaseActionConfig onSave={saveOperation} operation={selectedOperation} onDismiss={()=>setSelectedOperation(null)}>
-                </BaseActionConfig>
+                <BaseActionConfig onSave={saveOperation} operation={selectedOperation} onDismiss={()=>setSelectedOperation(null)} />
             }
         </div>
     );

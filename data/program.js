@@ -7,21 +7,12 @@ module.exports = {
             "operations": [
                 {
                     "id": 0,
-                    "order": 0,
                     "name": "Inicio",
                     "type": "start",
                     "level": 0
                 },
                 {
-                    "id": 1,
-                    "order": 7,
-                    "name": "Fin",
-                    "type": "end",
-                    "level": 0
-                },
-                {
                     "id": 2,
-                    "order": 1,
                     "name": "Declarar a",
                     "type": "declaration",
                     "variable": {
@@ -33,7 +24,6 @@ module.exports = {
                 },
                 {
                     "id": 3,
-                    "order": 2,
                     "name": "Declarar b",
                     "type": "declaration",
                     "variable": {
@@ -45,7 +35,6 @@ module.exports = {
                 },
                 {
                     "id": 4,
-                    "order": 3,
                     "name": "Leer a",
                     "type": "input",
                     "message": "Ingrese el valor de a",
@@ -54,7 +43,6 @@ module.exports = {
                 },
                 {
                     "id": 5,
-                    "order": 4,
                     "name": "Leer b",
                     "type": "input",
                     "message": "Ingrese el valor de b",
@@ -63,7 +51,6 @@ module.exports = {
                 },
                 {
                     "id": 9,
-                    "order": 0,
                     "name": "Imprimir es menor o igual a 10",
                     "type": "output",
                     "expression": {
@@ -84,8 +71,13 @@ module.exports = {
                             }
                         ]
                     },
-                    "level": 1,
-                    "parent": "7_no"
+                    "level": 0
+                },
+                {
+                    "id": 1,
+                    "name": "Fin",
+                    "type": "end",
+                    "level": 0
                 }
             ]
         }

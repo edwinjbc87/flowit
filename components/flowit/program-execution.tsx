@@ -1,16 +1,12 @@
 
-import { BaseOperationSchema } from "@/entities/BaseOperationSchema";
 import useProgram from "@/hooks/useProgram";
 import { BsPlay } from "react-icons/bs";
-import { FormattedMessage, useIntl } from "react-intl"
-import { ProgramSchema } from "@/entities/ProgramSchema";
-import { useEffect, useState } from "react";
-const programSchema = require("@/data/program") as ProgramSchema;
+import { useIntl } from "react-intl"
 import styles from "@/styles/program-execution.module.css";
 
 export default function ProgramExecution(){
     const intl = useIntl();
-    const {project, program, execution, handler} = useProgram();
+    const {execution, handler} = useProgram();
 
 
     const runProgram = async () => {

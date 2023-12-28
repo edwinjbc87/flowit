@@ -4,4 +4,6 @@ import { ExpressionSchema, VariableSchema } from "./ExpressionSchema";
 
 export interface ConditionOperationSchema extends BaseOperationSchema {
     condition: ExpressionSchema|boolean;
+    yesOperations: BaseOperationSchema[];
+    noOperations: BaseOperationSchema[];
 }

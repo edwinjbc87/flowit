@@ -2,12 +2,12 @@ import useProgram from '@/hooks/useProgram';
 import styles from '@/styles/files-navigation.module.css';
 
 export default function FilesNavigation() {
-    const {project, handler} = useProgram();
+    const {program,handler} = useProgram();
 
     return (
     <section className={styles['files-navigation']}>
         <ul className="nav nav-tabs flex flex-col md:flex-row flex-wrap list-none border-b-0 pl-0 mb-0" id="tabs-tab" role="tablist">
-            {project.modules.map(m => (
+            {program.modules.map(m => (
                 <li className="nav-item" role="presentation" key={`li-${m.name}`}>
                     <a 
                         key={m.name} 

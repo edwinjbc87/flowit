@@ -1,7 +1,7 @@
 import { ExpressionSchema, ExpressionValue, ValueType } from "@/entities/ExpressionSchema";
 import useProgram from "@/hooks/useProgram";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { Functions } from "@/libs/flowit/Functions";
+import { Functions } from "@/libs/flowit/Enums";
 import { useIntl } from "react-intl";
 import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDefinition";
 import styles from "@/styles/expression-input.module.css";

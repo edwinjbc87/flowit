@@ -1,3 +1,5 @@
+import { BaseOperationSchema } from "./BaseOperationSchema";
+
 export enum NodeType {
     Start = 'start',
     End = 'end',
@@ -21,4 +23,7 @@ export interface Node {
     width?: number;
     height?: number;
     parentNode?: string;
+    yesOperations?: Node[];
+    noOperations?: Node[];
+    operationId?: number;
 }
