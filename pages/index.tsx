@@ -11,14 +11,16 @@ import ProgramExecution from '@/components/flowit/program-execution';
 import { ProgramSchema } from '@/entities/ProgramSchema';
 import useProgram from '@/hooks/useProgram';
 import { useEffect } from 'react';
-const program = require("@/data/program") as ProgramSchema;
 
-
-const Home: NextPage = () => {
+const Home: NextPage = () => {  
   const intl = useIntl();
   const {handler} = useProgram()
 
   const loadProgram = async () => {
+    let program = {} as ProgramSchema;
+    let lang = intl.formatMessage({id: "lang"});
+    if(lang == "es") program = require(`@/data/defaultProgram.es`) as ProgramSchema;
+    else program = require(`@/data/defaultProgram.en`) as ProgramSchema;
     await handler.setProgram(program);
 }
 

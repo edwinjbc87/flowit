@@ -42,22 +42,54 @@ export default function useProgram() {
         await dispatch(setOperationName({id, name}));
     }
 
-    const saveOperation = async (operation: BaseOperationSchema) => {
-        await findAndUpdateOperation(String(operation.id), operation, program.modules[currentModuleIndex].operations)
-    }
-
-    const patchOperation = (operation: BaseOperationSchema, operations: BaseOperationSchema[], previousId: number): BaseOperationSchema[] => {
+    const patchNewOperation = (operation: BaseOperationSchema, operations: BaseOperationSchema[], previousId: number): BaseOperationSchema[] => {
         for(let i = 0; i < operations.length; i++) {
             if(operations[i].id == previousId) {
                 operations.splice(i+1, 0, operation);
                 break;
             } else if(operations[i].type == OperationType.Loop) {
                 const loop = operations[i] as LoopOperationSchema;
-                loop.yesOperations = patchOperation(operation, [...loop.yesOperations], previousId);
+                loop.yesOperations = patchNewOperation(operation, [...loop.yesOperations], previousId);
             } else if(operations[i].type == OperationType.Condition) {
                 const condition = operations[i] as ConditionOperationSchema;
-                condition.yesOperations = patchOperation(operation, [...condition.yesOperations], previousId);
-                condition.noOperations = patchOperation(operation, [...condition.noOperations], previousId);
+                condition.yesOperations = patchNewOperation(operation, [...condition.yesOperations], previousId);
+                condition.noOperations = patchNewOperation(operation, [...condition.noOperations], previousId);
+            }
+        }
+
+        return operations;
+    }
+
+    const patchCurrentOperation = (operation: BaseOperationSchema, operations: BaseOperationSchema[]): BaseOperationSchema[] => {
+        for(let i = 0; i < operations.length; i++) {
+            if(operations[i].id == operation.id) {
+                operations.splice(i, 1, operation);
+                break;
+            } else if(operations[i].type == OperationType.Loop) {
+                const loop = operations[i] as LoopOperationSchema;
+                loop.yesOperations = patchCurrentOperation(operation, [...loop.yesOperations]);
+            } else if(operations[i].type == OperationType.Condition) {
+                const condition = operations[i] as ConditionOperationSchema;
+                condition.yesOperations = patchCurrentOperation(operation, [...condition.yesOperations]);
+                condition.noOperations = patchCurrentOperation(operation, [...condition.noOperations]);
+            }
+        }
+
+        return operations;
+    }
+
+    const removeOperation = (operationId: number, operations: BaseOperationSchema[]): BaseOperationSchema[] => {
+        for(let i = 0; i < operations.length; i++) {
+            if(operations[i].id == operationId) {
+                operations.splice(i, 1);
+                break;
+            } else if(operations[i].type == OperationType.Loop) {
+                const loop = operations[i] as LoopOperationSchema;
+                loop.yesOperations = removeOperation(operationId, [...loop.yesOperations]);
+            } else if(operations[i].type == OperationType.Condition) {
+                const condition = operations[i] as ConditionOperationSchema;
+                condition.yesOperations = removeOperation(operationId, [...condition.yesOperations]);
+                condition.noOperations = removeOperation(operationId, [...condition.noOperations]);
             }
         }
 
@@ -99,7 +131,7 @@ export default function useProgram() {
             } as ConditionOperationSchema;
         } 
         
-        _program.modules[currentModuleIndex].operations = patchOperation(op, _program.modules[currentModuleIndex].operations, previousId);
+        _program.modules[currentModuleIndex].operations = patchNewOperation(op, _program.modules[currentModuleIndex].operations, previousId);
 
         await _setProgram(_program);
     }
@@ -108,14 +140,19 @@ export default function useProgram() {
         return findOperation(id, opers ?? program.modules[currentModuleIndex].operations);
     }
 
-    const findAndUpdateOperation = async (id: string, operation: BaseOperationSchema, operations:BaseOperationSchema[]) => {
-        const _program = JSON.parse(JSON.stringify(program));
-        const operIndex = _program.modules[currentModuleIndex].operations.findIndex(op => String(op.id) == String(id))
-        if(operIndex >= 0) {
-            _program.modules[currentModuleIndex].operations[operIndex] = operation
-            
-            await dispatch(setProgram({..._program, modules: _program.modules.map(module => ({...module, diagram: parseModule(module)} as ModuleSchema))}))
-        }
+    const findAndUpdateOperation = async (id: number, operation: BaseOperationSchema) => {
+        const _program:ProgramSchema = JSON.parse(JSON.stringify(program));
+        _program.modules[currentModuleIndex].operations = patchCurrentOperation({...operation, id: id}, _program.modules[currentModuleIndex].operations);
+
+        await _setProgram(_program); 
+    }
+
+    const findAndRemoveOperation = async (id: number) => {
+        const _program:ProgramSchema = JSON.parse(JSON.stringify(program));
+
+        _program.modules[currentModuleIndex].operations = removeOperation(id, _program.modules[currentModuleIndex].operations);
+
+        await _setProgram(_program); 
     }
 
     function isExpression(expression: any): expression is ExpressionSchema {
@@ -207,7 +244,7 @@ export default function useProgram() {
     }
 
     const getDefaultOperation = async (operation:OperationType):Promise<BaseOperationSchema> => {
-        const newOperation = {id: new Date().getTime(), name: "", type: operation, level: 0}
+        const newOperation = {name: "", type: operation, level: 0}
         switch(operation) {
             case OperationType.Declaration: {
                 return {...newOperation, variable: {name: "", type: ValueType.String}} as DeclarationOperationSchema
@@ -310,5 +347,5 @@ export default function useProgram() {
     //     _setProject(proy).catch(console.error);
     // }, [program]);
 
-    return {program, diagram, currentModuleIndex, execution, handler: {setCurrentModule: _setCurrentModule, setProgram: _setProgram, getCurrentModule, runProgram, renameOperation, updateOperation: findAndUpdateOperation, saveOperation, getOperation: _findOperation, isExpression, getExpressionDefinition, addOperation, getDefaultOperation}}
+    return {program, diagram, currentModuleIndex, execution, handler: {setCurrentModule: _setCurrentModule, setProgram: _setProgram, getCurrentModule, runProgram, renameOperation, updateOperation: findAndUpdateOperation, removeOperation: findAndRemoveOperation, getOperation: _findOperation, isExpression, getExpressionDefinition, addOperation, getDefaultOperation}}
 }

@@ -14,14 +14,14 @@ import LoopActionConfig from "./loop-action-config";
 
 interface BaseActionConfigProps {
     operation: BaseOperationSchema,
-    children?: React.ReactNode,
     onDismiss: () => void,
     onSave: (operation: BaseOperationSchema) => void,
+    onRemove: (id: number) => void,
 }
 
 export default function BaseActionConfig(props: BaseActionConfigProps) {
     const intl = useIntl();
-    const {children, onDismiss} = props;
+    const {onDismiss} = props;
     const {program, handler} = useProgram();
     const [operation, setOperation] = useState<BaseOperationSchema>({...props.operation});
 
@@ -31,6 +31,11 @@ export default function BaseActionConfig(props: BaseActionConfigProps) {
 
     const saveOperation = async ()=>{
         await props.onSave(operation);
+    }
+
+    const removeOperation = async ()=>{
+        await props.onRemove(operation.id);
+        onDismiss();
     }
 
     return (
@@ -61,9 +66,14 @@ export default function BaseActionConfig(props: BaseActionConfigProps) {
                         {operation.type == OperationType.Condition && <ConditionActionConfig {...{operation, onChange: updateOperation}}></ConditionActionConfig>}
                         {operation.type == OperationType.Loop && <LoopActionConfig {...{operation, onChange: updateOperation}}></LoopActionConfig>}
                     </div>
-                    <div className="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">
-                        <button type="button" onClick={()=>saveOperation()} className="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out mr-1">{intl.formatMessage({id: "general.save"})}</button>
-                        <button type="button" onClick={()=>onDismiss()} className="inline-block border px-6 py-2.5 border-blue-400 font-medium text-xs leading-tight uppercase rounded shadow-md hover:text-white hover:border-transparent hover:bg-blue-700 hover:shadow-lg focus:text-white focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:text-white active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out">{intl.formatMessage({id: "general.cancel"})}</button>
+                    <div className="modal-footer flex flex-shrink-0 flex-wrap items-center justify-between p-4 border-t border-gray-200 rounded-b-md">
+                        {operation.id && ![OperationType.Start, OperationType.End].includes(operation.type) && <div>
+                            <button type="button" onClick={()=>removeOperation()} className="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out mr-1">{intl.formatMessage({id: "general.delete"})}</button>
+                        </div>}
+                        <div className={`flex flex-shrink-0 flex-wrap items-center justify-end flex-1 ${!operation.id || [OperationType.Start, OperationType.End].includes(operation.type) ? 'w-full': ''}`}>
+                            <button type="button" onClick={()=>saveOperation()} className="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out mr-1">{intl.formatMessage({id: "general.save"})}</button>
+                            <button type="button" onClick={()=>onDismiss()} className="inline-block border px-6 py-2.5 border-blue-400 font-medium text-xs leading-tight uppercase rounded shadow-md hover:text-white hover:border-transparent hover:bg-blue-700 hover:shadow-lg focus:text-white focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:text-white active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out">{intl.formatMessage({id: "general.cancel"})}</button>
+                        </div>                        
                     </div>
                 </div>
             </div>

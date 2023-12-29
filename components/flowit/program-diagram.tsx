@@ -36,6 +36,13 @@ export default function ProgramDiagram() {
         setSelectedOperation(handler.getOperation(Number(id)));
     }
 
+    const removeNode = async (id: string) => {
+        if(confirm(intl.formatMessage({id: "config.removeConfirm"}))){
+            await handler.removeOperation(Number(id));
+            setSelectedOperation(null);
+        }
+    }
+
     const addNode = async (operation: NodeType) => {
         const op = await handler.getDefaultOperation(String(operation) as OperationType);
         const prevOp = handler.getOperation(Number(selectedEdge?.source ?? 0));        
@@ -51,7 +58,7 @@ export default function ProgramDiagram() {
         if(selectedEdge != null){
             await handler.addOperation(operation, Number(selectedEdge.source))
         } else {
-            await handler.saveOperation(operation)
+            await handler.updateOperation(operation.id, operation)
         }
         
         setSelectedOperation(null)
@@ -99,7 +106,7 @@ export default function ProgramDiagram() {
             </section>
             {dlgSelAction && <ActionSelector onSelectedOperation={addNode} onDismiss={()=>{setDlgSelAction(false)}}></ActionSelector>}
             {selectedOperation && 
-                <BaseActionConfig onSave={saveOperation} operation={selectedOperation} onDismiss={()=>setSelectedOperation(null)} />
+                <BaseActionConfig onSave={saveOperation} operation={selectedOperation} onDismiss={()=>setSelectedOperation(null)} onRemove={(id)=>removeNode(String(id))} />
             }
         </div>
     );
