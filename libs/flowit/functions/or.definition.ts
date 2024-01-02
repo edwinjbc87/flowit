@@ -1,10 +1,11 @@
 import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema";
 import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDefinition";
 import IOperationFunction from "../IOperationFunction";
+import { Functions } from "../Enums";
 
 class Or implements IOperationFunction {
     definition:OperationDefinition = {
-        name: "or",
+        name: Functions.Or,
         returnType: ValueType.Boolean,
         unlimitedParameters: {name: "op", type: ValueType.Boolean} as ParameterDefinition,
         description: "Return true if any of the parameters is true"

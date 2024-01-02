@@ -1,13 +1,14 @@
 import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema";
 import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDefinition";
 import IOperationFunction from "../IOperationFunction";
+import { Functions } from "../Enums";
 
 class Addition implements IOperationFunction {
     definition:OperationDefinition = {
         name: "sum",
         returnType: ValueType.Number,
         unlimitedParameters: {name: "op", type: ValueType.Number} as ParameterDefinition,
-        description: "Adds two numbers"
+        description: "Return the sum of all parameters."
     };
     async calculate(params: ExpressionSchema[], evaluateExpression: (exp: ExpressionSchema) => Promise<any>): Promise<any> {
         let acc = 0;

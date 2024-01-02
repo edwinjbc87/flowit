@@ -1,10 +1,11 @@
 import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema";
 import { OperationDefinition } from "@/entities/OperationDefinition";
 import IOperationFunction from "../IOperationFunction";
+import { Functions } from "../Enums";
 
 class Module implements IOperationFunction {
     definition:OperationDefinition = {
-        name: "mod",
+        name: Functions.Mod,
         returnType: ValueType.Number,
         parameters: [{
             name: "op1",

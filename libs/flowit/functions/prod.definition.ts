@@ -1,10 +1,11 @@
 import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema";
 import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDefinition";
 import IOperationFunction from "../IOperationFunction";
+import { Functions } from "../Enums";
 
 class Product implements IOperationFunction {
     definition:OperationDefinition = {
-        name: "prod",
+        name: Functions.Prod,
         returnType: ValueType.Number,
         unlimitedParameters: {name: "op", type: ValueType.Number} as ParameterDefinition,
         description: "Multiply many numbers"

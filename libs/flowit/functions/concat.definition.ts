@@ -1,10 +1,11 @@
 import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema";
 import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDefinition";
 import IOperationFunction from "../IOperationFunction";
+import { Functions } from "../Enums";
 
 class Concat implements IOperationFunction {
     definition:OperationDefinition = {
-        name: "concat",
+        name: Functions.Concat,
         returnType: ValueType.String,
         unlimitedParameters: {name: "op", type: ValueType.Any} as ParameterDefinition,
         description: "Concat mutiple strings"

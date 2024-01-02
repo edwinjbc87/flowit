@@ -112,7 +112,6 @@ export function useProgramParser() {
             if(Boolean(parentNode)) {
                 node.parentNode = parentNode;
             }
-            console.log("Node parsed", node);
             diagram.nodes.push(node)
     
             if(size.width > diagram.dimension.width) {

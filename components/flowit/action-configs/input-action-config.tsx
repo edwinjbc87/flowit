@@ -1,11 +1,11 @@
 import { DeclarationOperationSchema } from "@/entities/DeclarationOperationSchema"
 import { useIntl } from "react-intl"
 import useProgram from "@/hooks/useProgram"
-import { ExpressionSchema } from "@/entities/ExpressionSchema"
 import { useEffect, useState } from "react"
 import { BaseOperationSchema, OperationType } from "@/entities/BaseOperationSchema"
-import {ValueType} from "@/entities/ExpressionSchema"
 import { InputOperationSchema } from "@/entities/InputOperationSchema"
+import TextField from "../general/textfield"
+import Dropdown from "../general/dropdown"
 
 interface InputActionConfigProps {
     operation?: BaseOperationSchema;
@@ -25,24 +25,21 @@ export default function InputActionConfig(props: InputActionConfigProps) {
     }
 
     useEffect(() => {
+        const vars = program.modules[currentModuleIndex].operations.filter(o=>o.type == OperationType.Declaration).map(o => (o as DeclarationOperationSchema).variable.name);
         if(props.operation){
-            setOperation(props.operation as InputOperationSchema)
+            setOperation({...props.operation, variable: Boolean((props.operation as InputOperationSchema).variable) ? (props.operation as InputOperationSchema).variable : vars[0]} as InputOperationSchema)
         }
 
-        setVariables(program.modules[currentModuleIndex].operations.filter(o=>o.type == OperationType.Declaration).map(o => (o as DeclarationOperationSchema).variable.name));
+        setVariables(vars);
     }, [props.operation])
 
     return (
     <>
         <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">{intl.formatMessage({id: "config.message"})}</label>
-            <input title={intl.formatMessage({id: "config.message"})} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={operation.message} onChange={(ev)=>{updateOperation({...operation, message: ev.currentTarget.value})}} type="text" />
+            <TextField title={intl.formatMessage({id: "config.message"})} label={intl.formatMessage({id: "config.message"})} value={operation.message} onChange={(ev, value)=>{updateOperation({...operation, message: value})}} />
         </div>
         <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">{intl.formatMessage({id: "config.variableName"})}</label>
-            <select title={intl.formatMessage({id: "config.variableName"})} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={operation.variable} onChange={(ev)=>{updateOperation({...operation, variable: ev.currentTarget.value})}}>
-                {variables.map((v, idx)=>(<option key={`invar-${idx}`} value={v}>{v}</option>))}
-            </select>
+            <Dropdown title={intl.formatMessage({id: "config.variableName"})} label={intl.formatMessage({id: "config.variableName"})} selectedKey={operation.variable ?? variables[0]} options={variables.map(v => ({key: v, text: v}))} onChange={(ev, value)=>{updateOperation({...operation, variable: value.key})}} />
         </div>
     </>)
 }

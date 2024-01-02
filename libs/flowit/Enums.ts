@@ -19,4 +19,5 @@ export enum Functions{
     Max = "max",
     Min = "min",
     Length = "length",
+    Not = "not",
 }

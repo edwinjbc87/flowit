@@ -1,10 +1,11 @@
 import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema";
 import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDefinition";
 import IOperationFunction from "../IOperationFunction";
+import { Functions } from "../Enums";
 
 class Min implements IOperationFunction {
     definition:OperationDefinition = {
-        name: "min",
+        name: Functions.Min,
         returnType: ValueType.Number,
         unlimitedParameters: {name: "op", type: ValueType.Number} as ParameterDefinition,
         description: "Return the minimum value from many numbers"

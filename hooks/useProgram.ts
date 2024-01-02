@@ -197,16 +197,38 @@ export default function useProgram() {
     }
 
     const getExpressionDefinition = async (operation: Functions) => {
-        const operator:IOperationFunction = (await import(`@/libs/flowit/functions/${operation}.definition.ts`)).default as IOperationFunction
-        return operator.definition
-        
+        try {
+            const operator:IOperationFunction = (await import(`@/libs/flowit/functions/${operation}.definition.ts`)).default as IOperationFunction
+            return operator.definition;
+        }
+        catch(e) {
+            return null
+        }
+    }
+
+    const pauseProgram = async () => {
+        await dispatch(setExecution({ ...execution, isRunning: false }))
+    }
+
+    const resumeProgram = async () => {
+        await dispatch(setExecution({ ...execution, isRunning: true }))
+    }
+
+    const resetProgram = async () => {
+        variables.current.clear()
+        await dispatch(setExecution({ isRunning: false, currentNode: 0, variables: {}, output: [] }))
     }
 
     const runProgram = async () => {
         variables.current.clear()
         await dispatch(setExecution({ isRunning: true, currentNode: 0, variables: {}, output: [] }))
-        await runModule(program.modules[currentModuleIndex])
-        await dispatch(setExecution({ isRunning: false }))
+        try {
+            await runModule(program.modules[currentModuleIndex])
+        }catch(e) {
+            await dispatch(addExecutionOutput(e))
+        }finally {
+            await dispatch(setExecution({ isRunning: false }))
+        }
     }
 
     const runModule = async (module:ModuleSchema)=>{
@@ -274,10 +296,10 @@ export default function useProgram() {
         return newOperation as BaseOperationSchema
     }
 
-    const runScope = async (operations: BaseOperationSchema[], parentId?:string)=>{
+    const runScope = async (operations: BaseOperationSchema[], parentId?:string, idxOperation?: number)=>{
         const opers = operations as BaseOperationSchema[]
 
-        for(let i = 0; i < opers.length; i++) {
+        for(let i = idxOperation ?? 0; i < opers.length; i++) {
             let operation = opers[i]
             switch(operation.type) {
                 case OperationType.Declaration: {
@@ -347,5 +369,21 @@ export default function useProgram() {
     //     _setProject(proy).catch(console.error);
     // }, [program]);
 
-    return {program, diagram, currentModuleIndex, execution, handler: {setCurrentModule: _setCurrentModule, setProgram: _setProgram, getCurrentModule, runProgram, renameOperation, updateOperation: findAndUpdateOperation, removeOperation: findAndRemoveOperation, getOperation: _findOperation, isExpression, getExpressionDefinition, addOperation, getDefaultOperation}}
+    return {program, diagram, currentModuleIndex, execution, handler: {
+        setCurrentModule: _setCurrentModule, 
+        setProgram: _setProgram, 
+        getCurrentModule, 
+        resetProgram,
+        runProgram, 
+        pauseProgram,
+        resumeProgram,
+        renameOperation, 
+        updateOperation: findAndUpdateOperation, 
+        removeOperation: findAndRemoveOperation, 
+        getOperation: _findOperation, 
+        isExpression, 
+        getExpressionDefinition, 
+        addOperation, 
+        getDefaultOperation
+    }}
 }

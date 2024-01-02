@@ -3,19 +3,19 @@ import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDe
 import IOperationFunction from "../IOperationFunction";
 import { Functions } from "../Enums";
 
-class Lt implements IOperationFunction {
+class Neq implements IOperationFunction {
     definition:OperationDefinition = {
-        name: Functions.Lt,
+        name: Functions.Neq,
         returnType: ValueType.Boolean,
         parameters: [
-            {name: "op1", type: ValueType.Number},
-            {name: "op2", type: ValueType.Number}
+            {name: "op1", type: ValueType.Any},
+            {name: "op2", type: ValueType.Any}
         ],
-        description: "Return true if the first parameter is less than the second"
+        description: "Return true if the first parameter is equal than the second"
     };
     async calculate(params: ExpressionSchema[], evaluateExpression: (exp: ExpressionSchema) => Promise<any>): Promise<any> {
-        return await evaluateExpression(params[0]) < await evaluateExpression(params[1]);
+        return await evaluateExpression(params[0]) != await evaluateExpression(params[1]);
     }
 }
 
-export default new Lt();
+export default new Neq();

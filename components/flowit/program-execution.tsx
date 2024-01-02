@@ -1,22 +1,33 @@
 
 import useProgram from "@/hooks/useProgram";
-import { BsPlay } from "react-icons/bs";
+import { BsEraser, BsPlay, BsStop } from "react-icons/bs";
 import { useIntl } from "react-intl"
 import styles from "@/styles/program-execution.module.css";
+import PrimaryButton from "./general/primary-button";
+import DefaultButton from "./general/default-button";
 
 export default function ProgramExecution(){
     const intl = useIntl();
     const {execution, handler} = useProgram();
 
 
-    const runProgram = async () => {
-        await handler.runProgram();
-    }
+    const runProgram = async () => await handler.runProgram();
+    const pauseProgram = async () => await handler.pauseProgram();
+    const resumeProgram = async () => await handler.resumeProgram();
+    const resetProgram = async () => await handler.resetProgram();
 
     return (
         <aside className="divide-y h-full">
-            <section className="pb-1">
-                <button className={`flex px-6 pt-2.5 pb-2 bg-blue-600 text-white font-medium text-xs leading-normal uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out disabled:opacity-50`} disabled={execution.isRunning} onClick={()=>runProgram()}><BsPlay size={16} /> {execution.isRunning ? intl.formatMessage({id: "playground.running"}) : intl.formatMessage({id: "playground.run"})}</button>
+            <section className="pb-1 flex">
+                {!execution.isRunning && <PrimaryButton onClick={()=>runProgram()}>
+                    <BsPlay size={16} /> {intl.formatMessage({id: "playground.run"})}
+                </PrimaryButton>}
+                {execution.isRunning && <PrimaryButton onClick={()=>runProgram()}>
+                    <BsStop size={16} /> {intl.formatMessage({id: "playground.stop"})}
+                </PrimaryButton>}
+                <DefaultButton onClick={()=>resetProgram()}>
+                    <BsEraser size={16} /> {intl.formatMessage({id: "playground.reset"})}
+                </DefaultButton>
             </section>
             <section className={`grid grid-rows grid-rows-2 ${styles['execution-panel__main']}`}>
                 <section className="">

@@ -18,7 +18,7 @@ export type ExpressionValue = string | number | boolean | Array<string | number 
 export interface VariableSchema {
     name: string;
     type: ValueType;
-    value: ExpressionSchema;
+    value: ExpressionSchema|any;
 } 
 
 export interface OperandSchema {

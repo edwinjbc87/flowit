@@ -1,10 +1,11 @@
 import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema";
 import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDefinition";
 import IOperationFunction from "../IOperationFunction";
+import { Functions } from "../Enums";
 
 class Gt implements IOperationFunction {
     definition:OperationDefinition = {
-        name: "gt",
+        name: Functions.Gt,
         returnType: ValueType.Boolean,
         parameters: [
             {name: "op1", type: ValueType.Number},

@@ -1,10 +1,11 @@
 import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema";
 import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDefinition";
 import IOperationFunction from "../IOperationFunction";
+import { Functions } from "../Enums";
 
 class Max implements IOperationFunction {
     definition:OperationDefinition = {
-        name: "max",
+        name: Functions.Max,
         returnType: ValueType.Number,
         unlimitedParameters: {name: "op", type: ValueType.Number} as ParameterDefinition,
         description: "Return the maximum value from many numbers"

@@ -18,6 +18,7 @@
     "config.addParam": "Agregar Parámetro",
     "config.removeParam": "Remover Parámetro",
     "config.removeConfirm": "¿Está seguro de eliminar esta operación?",
+    "config.select": "Seleccione...",
     "types.string": "Cadena",
     "types.number": "Número",
     "types.boolean": "Booleano",
@@ -28,7 +29,9 @@
     "playground.actions": "Acciones",
     "playground.program": "Programa",
     "playground.pickanaction": "Seleccione una acción...",
-    "playground.run": "Ejecutar",    
+    "playground.run": "Ejecutar",
+    "playground.stop": "Detener",
+    "playground.reset": "Limpiar",
     "playground.running": "Ejecutando...", 
     "playground.variable": "Variable",
     "playground.value": "Valor",
@@ -61,5 +64,6 @@
     "operations.concat": "Concatenar",
     "operations.length": "Longitud",
     "operations.max": "Max",
-    "operations.min": "Min"
+    "operations.min": "Min",
+    "operations.not": "No"
 }

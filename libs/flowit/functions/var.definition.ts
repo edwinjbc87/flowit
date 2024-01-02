@@ -1,10 +1,11 @@
 import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema";
 import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDefinition";
 import IOperationFunction from "../IOperationFunction";
+import { Functions } from "../Enums";
 
 class Variable implements IOperationFunction {
     definition:OperationDefinition = {
-        name: "var",
+        name: Functions.Var,
         returnType: ValueType.Any,
         parameters: [{
             name: "op",

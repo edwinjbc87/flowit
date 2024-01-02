@@ -1,10 +1,11 @@
 import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema";
 import { OperationDefinition } from "@/entities/OperationDefinition";
 import IOperationFunction from "../IOperationFunction";
+import { Functions } from "../Enums";
 
 class Division implements IOperationFunction {
     definition:OperationDefinition = {
-        name: "div",
+        name: Functions.Div,
         returnType: ValueType.Number,
         parameters: [{
             name: "op1",

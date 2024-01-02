@@ -7,6 +7,8 @@ import { BaseOperationSchema, OperationType } from "@/entities/BaseOperationSche
 import {ValueType} from "@/entities/ExpressionSchema"
 import { AssignmentOperationSchema } from "@/entities/AssignmentOperationSchema"
 import ExpressionInput from "./expression-input"
+import Dropdown from "../general/dropdown"
+import ExpressionBuilder from "./expression-builder"
 
 interface AssignmentActionConfigProps {
     operation?: BaseOperationSchema;
@@ -20,9 +22,9 @@ export default function AssignmentActionConfig(props: AssignmentActionConfigProp
     const [operation, setOperation] = useState<AssignmentOperationSchema>({...props.operation} as AssignmentOperationSchema);
     const [variables, setVariables] = useState<string[]>([]);
 
-    const updateOperation = async (operation)=>{
+    const updateOperation = async (_operation)=>{
         if(props.onChange){
-            props.onChange(operation)
+            props.onChange(_operation)
         }
     }
 
@@ -30,23 +32,19 @@ export default function AssignmentActionConfig(props: AssignmentActionConfigProp
         const _vars = program.modules[currentModuleIndex].operations.filter(o=>o.type == OperationType.Declaration).map(o => (o as DeclarationOperationSchema).variable.name)
         
         setVariables(_vars);
-        if(props.operation){
-            setOperation({...props.operation, variable: _vars.length > 0 ? ((props.operation as AssignmentOperationSchema).variable ?? _vars[0]) : ""} as AssignmentOperationSchema)
-        }
+        const oper = props.operation as AssignmentOperationSchema;
+        setOperation({...props.operation, variable: _vars.length > 0 ? (oper.variable ? oper.variable : _vars[0]) : ""} as AssignmentOperationSchema)
     }, [props.operation])
 
 
     return (
     <>
         <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">{intl.formatMessage({id: "config.variableName"})}</label>
-            <select title={intl.formatMessage({id: "config.variableName"})} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={operation.variable} onChange={(ev)=>{updateOperation({...operation, variable: ev.currentTarget.value})}}>
-                {variables.map((v, idx)=>(<option key={`asvar-${idx}`} value={v}>{v}</option>))}
-            </select>
+            <Dropdown title={intl.formatMessage({id: "config.variableName"})} label={intl.formatMessage({id: "config.variableName"})} selectedKey={operation.variable ?? variables[0]} options={variables.map(v => ({key: v, text: v}))} onChange={(ev, value)=>{updateOperation({...operation, variable: value.key})}} />
         </div>
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">{intl.formatMessage({id: "config.expression"})}</label>
-            <ExpressionInput valueType={ValueType.Any} title={intl.formatMessage({id: "config.expression"})} expression={operation.expression} onChange={(_exp=>updateOperation({...operation, expression: _exp}))}></ExpressionInput>
+            <ExpressionBuilder variables={variables} value={operation.expression} onChange={(_exp)=>updateOperation({...operation, expression: _exp})} />
         </div>
     </>)
 }

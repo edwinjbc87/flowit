@@ -1,10 +1,11 @@
 import { ExpressionSchema, ValueType } from "@/entities/ExpressionSchema";
 import { OperationDefinition, ParameterDefinition } from "@/entities/OperationDefinition";
 import IOperationFunction from "../IOperationFunction";
+import { Functions } from "../Enums";
 
 class Geq implements IOperationFunction {
     definition:OperationDefinition = {
-        name: "gte",
+        name: Functions.Gte,
         returnType: ValueType.Boolean,
         parameters: [
             {name: "op1", type: ValueType.Number},
